@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  email            String          @unique
+  name             String?
+  role             Role            @default(USER)
+  status           Status          @default(PENDING)
+  password         String
+  fcmToken         String?
+  image            String?
+  latitude         Float?
+  longitude        Float?
+  location         String?
+  customerId       String?
+  connectAccountId String?
+  isVerified       Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  receiver         Notifications[] @relation("receiverDetails")
+  sender           Notifications[] @relation("senderDetails")
+  Review           Review[]
+}
+
+model Otp {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String    @unique
+  otp       Int
+  expiry    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("otps")
+}
+
+model Service {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       Float
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Review      Review[]
+  Booking     Booking[]
+}
+
+model Booking {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String
+  serviceId      String      @db.ObjectId
+  date           DateTime
+  description    String
+  location       String
+  latitude       Float?
+  longitude      Float?
+  isPaid         Boolean     @default(false)
+  paymentId      String?     @db.ObjectId
+  serviceDetails Service     @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  paymentDetails Payment?    @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  status         OrderStatus @default(PENDING)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  // Payment        Payment[]
+}
+
+model Review {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String   @db.ObjectId
+  serviceId      String   @db.ObjectId
+  rating         Float
+  comment        String?
+  serviceDetails Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  userDetails    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Payment {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String    @unique @db.ObjectId
+  amount        Float
+  paymentId     String?
+  paymentMethod String?
+  serviceId     String    @unique @db.ObjectId
+  // bookDetails Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Booking       Booking[]
+}
+
+model Notifications {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiverId String   @db.ObjectId
+  senderId   String?  @db.ObjectId
+  title      String
+  body       String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  receiver   User     @relation("receiverDetails", fields: [receiverId], references: [id])
+  sender     User?    @relation("senderDetails", fields: [senderId], references: [id])
+}
+
+enum Role {
+  USER
+  WORKER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum Status {
+  PENDING
+  ACTIVE
+  BLOCKED
+}
