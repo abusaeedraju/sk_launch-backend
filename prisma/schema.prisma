@@ -17,14 +17,16 @@ model User {
   id               String          @id @default(auto()) @map("_id") @db.ObjectId
   email            String          @unique
   name             String?
+  phone            String?
+  companyName      String?
   role             Role            @default(USER)
-  status           Status          @default(PENDING)
   password         String
+  country          String?
+  state            String?
+  city             String?
   fcmToken         String?
   image            String?
-  latitude         Float?
-  longitude        Float?
-  location         String?
+  status           Status          @default(PENDING)
   customerId       String?
   connectAccountId String?
   isVerified       Boolean         @default(false)
@@ -117,8 +119,8 @@ model Notifications {
 
 enum Role {
   USER
-  WORKER
   ADMIN
+  COMPANY
 }
 
 enum OrderStatus {

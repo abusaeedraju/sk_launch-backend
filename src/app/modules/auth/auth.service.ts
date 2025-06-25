@@ -90,6 +90,12 @@ const verifyOtp = async (payload: { email: string; otp: number }) => {
   }
 };
 
+const resetOtpVerify = async (payload: { email: string; otp: number }) => {
+  const {accessToken } = await OTPVerify(payload);
+
+  return accessToken;
+
+};
 const forgetPassword = async (payload: { email: string }) => {
   const findUser = await prisma.user.findUnique({
     where: {
@@ -102,13 +108,6 @@ const forgetPassword = async (payload: { email: string }) => {
 
   OTPFn(findUser.email);
   return;
-};
-
-const resetOtpVerify = async (payload: { email: string; otp: number }) => {
-  const {accessToken } = await OTPVerify(payload);
-
-  return accessToken;
-
 };
 
 const resendOtp = async (payload: { email: string }) => {
@@ -125,7 +124,7 @@ const resendOtp = async (payload: { email: string }) => {
 
 
 
-const socialLogin = async (payload: {
+ const socialLogin = async (payload: {
   email: string;
   name: string;
   role: Role;
@@ -164,9 +163,11 @@ const socialLogin = async (payload: {
       accessToken: accessToken,
     };
   } else {
+    const role: any = payload.role.toUpperCase();
     const result = await prisma.user.create({
       data: {
         ...payload,
+        role: role,
         password: "",
         status: "ACTIVE",
       },
@@ -176,14 +177,12 @@ const socialLogin = async (payload: {
         email: true,
         image: true,
         role: true,
-        customerId: true,
         status: true,
-        connectAccountId: true,
         createdAt: true,
         updatedAt: true,
       },
     });
-    const stripeCustomer = await stripe.customers.create({
+    /* const stripeCustomer = await stripe.customers.create({
       email: payload.email.trim(),
       name: payload.name || undefined,
     });
@@ -198,24 +197,23 @@ const socialLogin = async (payload: {
     await prisma.user.update({
       where: { id: result.id },
       data: { customerId: stripeCustomer.id },
-    });
+    });*/
 
     const accessToken = jwtHelpers.generateToken(
       { id: result.id, email: result.email, role: result.role },
       { expiresIn: "24 hr" }
-    );
+    ); 
     return {
       id: result.id,
       name: result.name,
       email: result.email,
       role: result.role,
-      customerId: result.customerId,
       image: result?.image,
       status: result.status,
       accessToken: accessToken,
     };
   }
-};
+}; 
 
 const resetPassword = async (payload: { token: string; password: string }) => {
 const {email} = jwtHelpers.tokenDecoder(payload.token) as JwtPayload;
@@ -236,6 +234,10 @@ const {email} = jwtHelpers.tokenDecoder(payload.token) as JwtPayload;
     data: {
       password: hashedPassword,
     },
+    select: {
+      name: true,
+      email: true,
+    }
   });
   return result;
 };

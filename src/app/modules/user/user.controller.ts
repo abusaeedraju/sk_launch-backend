@@ -15,7 +15,7 @@ const changePasswordController = catchAsync(async (req: Request, res: Response) 
     const { id } = req.user
     const body = req.body as any
     const result = await userServices.changePasswordIntoDB(id, body)
-    sendResponse(res, { statusCode: StatusCodes.OK, message: "User updated successfully", data: result, success: true })
+    sendResponse(res, { statusCode: StatusCodes.OK, message: "password updated successfully", data: result, success: true })
 })
 
 const updateUserController = catchAsync(async (req: Request, res: Response) => {

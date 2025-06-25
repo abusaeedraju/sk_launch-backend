@@ -36,7 +36,6 @@ const createUserIntoDB = async (payload: User) => {
             name: true,
             email: true,
             role: true,
-            status: true,
             createdAt: true,
             updatedAt: true
         }
@@ -56,7 +55,10 @@ const changePasswordIntoDB = async (id: string, payload: any) => {
         throw new ApiError(StatusCodes.NOT_FOUND, "User not found")
     }
     try {
-        await compare(payload.oldPassword, findUser.password)
+        const isMatch = await compare(payload.oldPassword, findUser.password)
+        if (!isMatch) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, "Old password is incorrect")
+        }
         const newPass = await hash(payload.newPassword, 10)
         await prisma.user.update({
             where: {
@@ -77,7 +79,7 @@ const changePasswordIntoDB = async (id: string, payload: any) => {
 const updateUserIntoDB = async (id: string, payload: any, image: any) => {
 
 
-    const userImage = await getImageUrl(image)
+    const userImage = image && await getImageUrl(image)
 
     try {
         const result = await prisma.user.update({
@@ -95,6 +97,10 @@ const updateUserIntoDB = async (id: string, payload: any, image: any) => {
             email: result.email,
             image: result.image,
             role: result.role,
+            phone: result.phone,
+            country: result.country,
+            state: result.state,
+            city: result.city,
             createdAt: result.createdAt,
             updatedAt: result.updatedAt,
         }

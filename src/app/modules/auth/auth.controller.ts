@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
-// import { userServices } from "../user/userService";
 import sendResponse from "../../middleware/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { authService } from "./auth.service";
-import { decode } from "jsonwebtoken";
 
 const logInUserController = catchAsync(async (req: Request, res: Response) => {
   const result = await authService.logInFromDB(req.body);
@@ -18,7 +16,6 @@ const logInUserController = catchAsync(async (req: Request, res: Response) => {
 
 const verifyOtp = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body as any;
-
   const result = await authService.verifyOtp(payload);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -27,19 +24,6 @@ const verifyOtp = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-
-
-const forgetPasswordController = catchAsync(
-  async (req: Request, res: Response) => {
-    const result = await authService.forgetPassword(req.body);
-    sendResponse(res, {
-      statusCode: StatusCodes.OK,
-      success: true,
-      message: "OTP sent to your email",
-      data: result,
-    });
-  }
-);
 
 
 const resetOtpVerifyController = catchAsync(async (req: Request, res: Response) => {
@@ -52,6 +36,17 @@ const resetOtpVerifyController = catchAsync(async (req: Request, res: Response) 
     data: result,
   });
 })
+const forgetPasswordController = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await authService.forgetPassword(req.body);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "OTP sent to your email, provide it to verify",
+      data: result,
+    });
+  }
+);
 
 
 const resendOtpController = catchAsync(async (req: Request, res: Response) => {
@@ -60,7 +55,7 @@ const resendOtpController = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: "OTP sent to your email",
+    message: "OTP sent to your email again, provide it to verify",
     data: result,
   });
 });
@@ -76,7 +71,7 @@ const resetPasswordController = catchAsync(async (req: Request, res: Response) =
   const body = req.body;
 
   const result = await authService.resetPassword(body);
-  sendResponse(res, {statusCode : StatusCodes.OK, success : true, message : "User login successfully", data : result});
+  sendResponse(res, {statusCode : StatusCodes.OK, success : true, message : "New password create successfully", data : result});
 })
 
 export const authController = {
