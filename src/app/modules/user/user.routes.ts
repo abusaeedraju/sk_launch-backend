@@ -13,7 +13,7 @@ route.post('/create', validateRequest(UserValidation.createValidation), userCont
 
 route.put('/change-password', auth(), validateRequest(UserValidation.changePasswordValidation), userController.changePasswordController)
 
-route.put("/update", auth(), fileUploader.uploadProfileImage, parseBodyMiddleware, userController.updateUserController)
+route.put("/update", auth(),fileUploader.uploadProfileUpdate, parseBodyMiddleware, userController.updateUserController)
 route.get("/profile", auth(), userController.getMyProfileController)
 
 export const userRoutes = route

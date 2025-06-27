@@ -14,16 +14,26 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  email            String          @unique
-  name             String?
-  phone            String?
-  companyName      String?
-  role             Role            @default(USER)
-  password         String
-  country          String?
-  state            String?
-  city             String?
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  email             String  @unique
+  name              String?
+  phone             String?
+  role              Role    @default(USER)
+  password          String
+  country           String?
+  state             String?
+  city              String?
+  //for company only
+  companyType       String?
+  establishmentYear Int?
+  yearsOfBusinesses Int?
+  operationCountry  String?
+  totalEmployees    Int?
+  hiringFromShuroo  Int?
+  about             String?
+  logoImage         String?
+  coverImage        String?
+
   fcmToken         String?
   image            String?
   status           Status          @default(PENDING)
@@ -34,7 +44,9 @@ model User {
   updatedAt        DateTime        @updatedAt
   receiver         Notifications[] @relation("receiverDetails")
   sender           Notifications[] @relation("senderDetails")
-  Review           Review[]
+  Job              Job[]
+  Post             Post[]
+  Repost           Repost[]
 }
 
 model Otp {
@@ -48,60 +60,49 @@ model Otp {
   @@map("otps")
 }
 
-model Service {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String
-  price       Float
-  image       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Review      Review[]
-  Booking     Booking[]
-}
-
-model Booking {
-  id             String      @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String
-  serviceId      String      @db.ObjectId
-  date           DateTime
-  description    String
-  location       String
-  latitude       Float?
-  longitude      Float?
-  isPaid         Boolean     @default(false)
-  paymentId      String?     @db.ObjectId
-  serviceDetails Service     @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  paymentDetails Payment?    @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-  status         OrderStatus @default(PENDING)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  // Payment        Payment[]
-}
-
-model Review {
+model Job {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String   @db.ObjectId
-  serviceId      String   @db.ObjectId
-  rating         Float
-  comment        String?
-  serviceDetails Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  userDetails    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  deadline       String
+  salary         Int
+  experience     String
+  location       String
+  vacancy        Int
+  mustSkills     String[]
+  goodSkills     String[]
+  description    String
+  industryType   String
+  department     String
+  role           String
+  employmentType String
+  education      String
+  aboutCompany   String
+  companyId      String @db.ObjectId
+  company        User     @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
 
-model Payment {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String    @unique @db.ObjectId
-  amount        Float
-  paymentId     String?
-  paymentMethod String?
-  serviceId     String    @unique @db.ObjectId
-  // bookDetails Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  Booking       Booking[]
+model Post {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  content        String
+  image          Json[]
+  userId         String   @db.ObjectId
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Repost         Repost[]
+}
+
+model Repost {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  content        String?
+  postId         String   @db.ObjectId
+  userId         String   @db.ObjectId
+  post           Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Notifications {

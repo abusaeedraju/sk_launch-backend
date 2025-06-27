@@ -51,6 +51,12 @@ export const getImageUrl = async (file: Express.MulterS3.File) => {
   return image;
 };
 
+const uploadProfileUpdate = upload.fields([
+  { name: 'logoImage', maxCount: 1 },
+  { name: 'coverImage', maxCount: 1 },
+  { name: 'profileImage', maxCount: 1 },
+]);
+const uploadPostImage = upload.array("postImage", 3);
 // Single image uploads
 const uploadProfileImage = upload.single("profileImage");
 const uploadFoodImages = upload.single("foodImage");
@@ -62,5 +68,7 @@ export const fileUploader = {
   upload,
   uploadProfileImage,
   uploadFoodImages,
-  serviceImage
+  serviceImage,
+  uploadProfileUpdate,
+  uploadPostImage
 };
