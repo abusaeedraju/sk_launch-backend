@@ -3,6 +3,8 @@ import { userRoutes } from "../modules/user/user.routes"
 import { authRoutes } from "../modules/auth/auth.routes"
 import { jobRoutes } from "../modules/job/job.routes"
 import { postRoutes } from "../modules/post/post.route"
+import { favoriteRoutes } from "../modules/favorite/favorite.route"
+import { applicationRoutes } from "../modules/application/application.route"
 
 const router = Router()
 const routes = [
@@ -21,6 +23,14 @@ const routes = [
     {
         path: "/post",
         component: postRoutes
+    },
+    {
+        path: "/favorite",
+        component: favoriteRoutes
+    },
+    {
+        path: "/application",
+        component: applicationRoutes
     }
 ]
 
