@@ -45,53 +45,81 @@ const deleteJob = async (id: string) => {
             where: {
                 id
             }
-        })    
+        })
         return result
     } catch (error) {
         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to delete job")
     }
 }
- 
+
 const getAllJob = async (query: any) => {
-        const result = await prisma.job.findMany({
-            where: {
-                ...query    
-            },
-            include: {
-                company:    {
-                    select: {
-                        id: true,
-                        name: true,
-                        logoImage: true,
-                    }
+    const result = await prisma.job.findMany({
+        where: {
+            ...query
+        },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logoImage: true,
                 }
             }
-        })
-        if(result.length === 0){
-            throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
         }
-        return result
+    })
+    if (result.length === 0) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
+    }
+    return result
 }
+
+interface JobQueryOptions {
+    employmentType?: 'FULLTIME' | 'PARTTIME' | 'HYBRID' | 'REMOTE';
+    search?: string;
+}
+export const getJobs = async (options: JobQueryOptions = {}) => {
+    const { employmentType, search } = options;
+
+    const jobs = await prisma.job.findMany({
+        where: {
+            ...(employmentType && {
+                employmentType: employmentType,
+            }),
+            ...(search && {
+                name: {
+                    contains: search,
+                    mode: 'insensitive', // case-insensitive search
+                },
+            }),
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+    });
+
+    return jobs;
+};
+
 
 const getSingleJob = async (id: string) => {
     const result = await prisma.job.findUnique({
-            where: {
-                id
-            },
-            include: {
-                company: {
-                    select: {
-                        id: true,
-                        name: true,
-                        logoImage: true,
-                    }
+        where: {
+            id
+        },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logoImage: true,
                 }
             }
-        })
-        if   (!result) {
-            throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
-        }   
-        return result
+        }
+    })
+    if (!result) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
+    }
+    return result
 }
 
 export const jobServices = {
@@ -99,5 +127,6 @@ export const jobServices = {
     editJob,
     deleteJob,
     getAllJob,
-    getSingleJob
+    getSingleJob,
+    getJobs
 }

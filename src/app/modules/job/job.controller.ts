@@ -25,15 +25,22 @@ const deleteJobController = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllJobController = catchAsync(async (req: Request, res: Response) => {
-    const query = req?.query as any
+    const query = req?.query || {} as any
     const result = await jobServices.getAllJob(query)
     sendResponse(res, { statusCode: StatusCodes.OK, message: "Job fetched successfully", data: result, success: true })
 })
-
+const fetchJobsHandler = catchAsync(async (req: Request, res: Response) => {
+      const { employmentType, search } = req.query;
+      const jobs = await jobServices.getJobs({
+        employmentType: employmentType as any,
+        search: search as string,
+      });   
+      sendResponse(res, { statusCode: StatusCodes.OK, message: "Job fetched successfully", data: jobs, success: true })
+})
 const getSingleJobController = catchAsync(async (req: Request, res: Response) => {
     const {jobId} = req.params
     const result = await jobServices.getSingleJob(jobId as any)
     sendResponse(res, { statusCode: StatusCodes.OK, message: "Job fetched successfully", data: result, success: true })
 })
 
-export const jobController = { createJobController, editJobController, deleteJobController, getAllJobController, getSingleJobController }
+export const jobController = { createJobController, editJobController, deleteJobController, getAllJobController, getSingleJobController, fetchJobsHandler }

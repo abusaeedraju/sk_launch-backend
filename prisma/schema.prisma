@@ -76,7 +76,7 @@ model Job {
   industryType   String
   department     String
   role           String
-  employmentType employmentType @default(FULLTIME)
+  employmentType employmentType 
   education      String
   aboutCompany   String
   companyId      String @db.ObjectId
