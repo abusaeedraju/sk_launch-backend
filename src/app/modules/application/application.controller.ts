@@ -11,7 +11,7 @@ const createApplicationController = catchAsync(async (req: Request, res: Respons
     sendResponse(res, { statusCode: StatusCodes.CREATED, message: "Application successfully", data: result, success: true })
 })  
 
-const getApplicationByUserIdController = catchAsync(async (req: Request, res: Response) => {
+const getAppliedJobController = catchAsync(async (req: Request, res: Response) => {
     const { id: userId } = req.user
     const result = await applicationServices.getAppliedJob(userId)
     sendResponse(res, { statusCode: StatusCodes.OK, message: "Application fetched successfully", data: result, success: true })
@@ -32,7 +32,7 @@ const getProfileViewedJobController = catchAsync(async (req: Request, res: Respo
 const shortlistApplicationController = catchAsync(async (req: Request, res: Response) => {
     const { applicationId } = req.params
     const result = await applicationServices.shortlistApplication(applicationId)
-    sendResponse(res, { statusCode: StatusCodes.OK, message: "Application fetched successfully", data: result, success: true })
+    sendResponse(res, { statusCode: StatusCodes.OK, message: "Application status updated successfully", data: result, success: true })
 })
 
 const getShortlistedJobController = catchAsync(async (req: Request, res: Response) => {
@@ -43,7 +43,7 @@ const getShortlistedJobController = catchAsync(async (req: Request, res: Respons
 const interviewApplicationController = catchAsync(async (req: Request, res: Response) => {
     const { applicationId } = req.params
     const result = await applicationServices.interviewApplication(applicationId)
-    sendResponse(res, { statusCode: StatusCodes.OK, message: "Application fetched successfully", data: result, success: true })
+    sendResponse(res, { statusCode: StatusCodes.OK, message: "Application status updated successfully", data: result, success: true })
 })
 
 const getInterviewJobController = catchAsync(async (req: Request, res: Response) => {
@@ -54,7 +54,7 @@ const getInterviewJobController = catchAsync(async (req: Request, res: Response)
 
 export const applicationController = {
     createApplicationController,
-    getApplicationByUserIdController,
+    getAppliedJobController,
     getProfileViewedJobController,
     getShortlistedJobController,
     getInterviewJobController,

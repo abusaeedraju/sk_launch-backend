@@ -25,7 +25,8 @@ const deleteJobController = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllJobController = catchAsync(async (req: Request, res: Response) => {
-    const result = await jobServices.getAllJob()
+    const query = req?.query as any
+    const result = await jobServices.getAllJob(query)
     sendResponse(res, { statusCode: StatusCodes.OK, message: "Job fetched successfully", data: result, success: true })
 })
 

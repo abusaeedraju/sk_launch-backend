@@ -76,7 +76,7 @@ model Job {
   industryType   String
   department     String
   role           String
-  employmentType String
+  employmentType employmentType @default(FULLTIME)
   education      String
   aboutCompany   String
   companyId      String @db.ObjectId
@@ -94,6 +94,7 @@ model JobApplication {
     status         applicationStatus   @default(APPLIED)
     job            Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
     user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    isProfileViewed Boolean  @default(false)
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
 }
@@ -165,5 +166,11 @@ enum applicationStatus {
   APPLIED
   SHORTLISTED
   INTERVIEW
-  PROFILEVIEW
+}
+
+enum employmentType {
+    FULLTIME
+    PARTTIME
+    HYBRID
+    REMOTE
 }

@@ -1,8 +1,18 @@
 import { prisma } from "../../../utils/prisma"
 import ApiError from "../../error/ApiErrors"
 import { StatusCodes } from "http-status-codes"
+import { User } from "@prisma/client"
 
 const createApplication = async (userId: string, jobId: string) => {
+    const isApplied = await prisma.jobApplication.findFirst({
+        where: {
+            userId,
+            jobId,
+        }
+    })
+    if (isApplied) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "You have already applied for this job")
+    }
     const result = await prisma.jobApplication.create({
         data: {
             userId,
@@ -12,16 +22,30 @@ const createApplication = async (userId: string, jobId: string) => {
     return result
 }
 
-const getAppliedJob  = async (userId: string) => {
+const getAppliedJob = async (userId: string) => {
     const result = await prisma.jobApplication.findMany({
         where: {
             userId,
+            status: "APPLIED",
         },
-        include: {  
-            job: true,
+        include: {
+            job: {
+                select: {
+                    id: true,
+                    name: true,
+                    salary: true,
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoImage: true,
+                        }
+                    },
+                }
+            }
         }
     })
-    if(result.length === 0){
+    if (result.length === 0) {
         throw new ApiError(StatusCodes.NOT_FOUND, "Application list is empty")
     }
     return result
@@ -31,31 +55,61 @@ const applicantProfileView = async (applicationId: string) => {
     const result = await prisma.jobApplication.findUnique({
         where: {
             id: applicationId,
-        },    
+        },
         include: {
             user: true,
         }
     })
-    return result
+    if (!result) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Application not found")
+    }
+    const { password, fcmToken, role, status, createdAt, updatedAt, email, customerId, connectAccountId, isVerified, companyType, establishmentYear, yearsOfBusinesses, operationCountry, totalEmployees, hiringFromShuroo, about, logoImage, coverImage, ...rest } = result?.user as User
+    const updatedReult = {
+        ...result,
+        user: rest,
+    }
+    await prisma.jobApplication.update({
+        where: {
+            id: applicationId,
+        },
+        data: {
+            isProfileViewed: true,
+        }
+    })
+    return updatedReult
 }
 
 const getProfileViewedJob = async (userId: string) => {
     const result = await prisma.jobApplication.findMany({
         where: {
             userId,
-            status: "PROFILEVIEW",
+            isProfileViewed: true,
+            status: "APPLIED",
         },
         include: {
-            job: true,
+            job: {
+                select: {
+                    id: true,
+                    name: true,
+                    salary: true,
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoImage: true,
+                        }
+                    },
+                }
+            }
         }
     })
-    if(result.length === 0){
+    if (result.length === 0) {
         throw new ApiError(StatusCodes.NOT_FOUND, "Application list is empty")
     }
     return result
 }
 
-const  shortlistApplication = async (id: string) => {
+const shortlistApplication = async (id: string) => {
     const result = await prisma.jobApplication.update({
         where: {
             id,
@@ -74,10 +128,23 @@ const getShortlistedJob = async (userId: string) => {
             status: "SHORTLISTED",
         },
         include: {
-            job: true,
+            job: {
+                select: {
+                    id: true,
+                    name: true,
+                    salary: true,
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoImage: true,
+                        }
+                    },
+                }
+            }
         }
     })
-    if(result.length === 0){
+    if (result.length === 0) {
         throw new ApiError(StatusCodes.NOT_FOUND, "Application list is empty")
     }
     return result
@@ -90,10 +157,10 @@ const interviewApplication = async (id: string) => {
         },
         data: {
             status: "INTERVIEW",
-            }
+        }
     })
     return result
-}   
+}
 
 const getInterviewJob = async (userId: string) => {
     const result = await prisma.jobApplication.findMany({
@@ -102,10 +169,23 @@ const getInterviewJob = async (userId: string) => {
             status: "INTERVIEW",
         },
         include: {
-            job: true,
+            job: {
+                select: {
+                    id: true,
+                    name: true,
+                    salary: true,
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoImage: true,
+                        }
+                    },
+                }
+            }
         }
     })
-    if(result.length === 0){
+    if (result.length === 0) {
         throw new ApiError(StatusCodes.NOT_FOUND, "Application list is empty")
     }
     return result

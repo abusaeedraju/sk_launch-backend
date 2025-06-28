@@ -52,26 +52,46 @@ const deleteJob = async (id: string) => {
     }
 }
  
-const getAllJob = async () => {
-    try {
-        const result = await prisma.job.findMany()
+const getAllJob = async (query: any) => {
+        const result = await prisma.job.findMany({
+            where: {
+                ...query    
+            },
+            include: {
+                company:    {
+                    select: {
+                        id: true,
+                        name: true,
+                        logoImage: true,
+                    }
+                }
+            }
+        })
+        if(result.length === 0){
+            throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
+        }
         return result
-    } catch (error) {
-        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to get all jobs")
-    }
 }
 
 const getSingleJob = async (id: string) => {
-    try {
-        const result = await prisma.job.findUnique({
+    const result = await prisma.job.findUnique({
             where: {
                 id
+            },
+            include: {
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                        logoImage: true,
+                    }
+                }
             }
         })
+        if   (!result) {
+            throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
+        }   
         return result
-    } catch (error) {
-        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to get single job")
-    }
 }
 
 export const jobServices = {

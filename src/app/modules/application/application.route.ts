@@ -6,7 +6,7 @@ import { Role } from "@prisma/client";
 const router = Router()
 
 router.post('/create/:jobId',auth(Role.USER), applicationController.createApplicationController)
-router.get('/getByUserId',auth(Role.USER), applicationController.getApplicationByUserIdController)
+router.get('/getAppliedJob',auth(Role.USER), applicationController.getAppliedJobController)
 router.get('/applicantProfileView/:applicationId',auth(Role.COMPANY), applicationController.applicantProfileViewController)
 router.put('/shortlistApplication/:applicationId',auth(Role.COMPANY), applicationController.shortlistApplicationController)
 router.put('/interviewApplication/:applicationId',auth(Role.COMPANY), applicationController.interviewApplicationController)
