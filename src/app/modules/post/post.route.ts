@@ -13,6 +13,7 @@ router.put("/update/:postId", auth(),fileUploader.uploadPostImage,parseBodyMiddl
 router.delete("/delete/:postId", auth(), postController.deletePostController)
 router.get("/all", postController.getAllPostController)
 router.get("/:postId", postController.getSinglePostController)
+router.get("/user/:userId", postController.getSingleUserPostController)
 router.post("/repost/:postId", auth(), postController.createRepostController)   
 
 export const postRoutes = router        

@@ -51,28 +51,6 @@ const deleteJob = async (id: string) => {
         throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to delete job")
     }
 }
-
-const getAllJob = async (query: any) => {
-    const result = await prisma.job.findMany({
-        where: {
-            ...query
-        },
-        include: {
-            company: {
-                select: {
-                    id: true,
-                    name: true,
-                    logoImage: true,
-                }
-            }
-        }
-    })
-    if (result.length === 0) {
-        throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
-    }
-    return result
-}
-
 interface JobQueryOptions {
     employmentType?: 'FULLTIME' | 'PARTTIME' | 'HYBRID' | 'REMOTE';
     search?: string;
@@ -91,6 +69,21 @@ export const getJobs = async (options: JobQueryOptions = {}) => {
                     mode: 'insensitive', // case-insensitive search
                 },
             }),
+        },
+        include: {
+            company: {
+                select: {
+                    id: true,
+                    name: true,
+                    logoImage: true,
+                }
+            },
+            _count: {
+                select: {
+                    Application: true
+                },
+            },
+
         },
         orderBy: {
             createdAt: 'desc',
@@ -113,12 +106,25 @@ const getSingleJob = async (id: string) => {
                     name: true,
                     logoImage: true,
                 }
+            },
+            Application: {
+                select: {
+                    id: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                        }
+                    }
+                }
             }
         }
     })
     if (!result) {
         throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
     }
+
     return result
 }
 
@@ -126,7 +132,6 @@ export const jobServices = {
     createJob,
     editJob,
     deleteJob,
-    getAllJob,
     getSingleJob,
     getJobs
 }

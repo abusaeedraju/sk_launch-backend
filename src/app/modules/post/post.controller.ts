@@ -46,11 +46,18 @@ const createRepostController = catchAsync(async (req: Request, res: Response) =>
     sendResponse(res, { statusCode: StatusCodes.OK, message: "Post fetched successfully", data: result, success: true })
 })
 
-export const postController = {
+const getSingleUserPostController = catchAsync(async (req: Request, res: Response) => {
+    const { userId } = req?.params
+    const result = await postServices.getSingleUserPost(userId)
+    sendResponse(res, { statusCode: StatusCodes.OK, message: "Post fetched successfully", data: result, success: true })
+})
+
+    export const postController = {
     createPostController,
     editPostController,
     deletePostController,
     getAllPostController,
     getSinglePostController,
-    createRepostController
+    createRepostController,
+    getSingleUserPostController
 }

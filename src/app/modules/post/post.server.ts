@@ -161,103 +161,165 @@ const getAllPost = async () => {
 }
 
 const getSinglePost = async (id: string) => {
-    try {
-        const result = await prisma.$transaction(async (tx) => {
-            // Try finding in Post
-            const post = await tx.post.findUnique({
-                where: { id }, select: {
-                    id: true,
-                    userId: true,
-                    content: true,
-                    image: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            image: true,
-                        }
+    const result = await prisma.$transaction(async (tx) => {
+        // Try finding in Post
+        const post = await tx.post.findUnique({
+            where: { id }, select: {
+                id: true,
+                userId: true,
+                content: true,
+                image: true,
+                createdAt: true,
+                updatedAt: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
                     }
                 }
-            });
-
-            // If not found in Post, try Repost
-            if (post) {
-                return { type: 'post', data: post };
             }
-
-            const repost = await tx.repost.findUnique({
-                where: { id }, select: {
-                    id: true,
-                    userId: true,
-                    postId: true,
-                    content: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            image: true,
-                        }
-                    },
-                    post: {
-                        select: {
-                            id: true,
-                            userId: true,
-                            content: true,
-                            image: true,
-                            createdAt: true,
-                            updatedAt: true,
-                            user: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    image: true,
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            if (repost) {
-                return { type: 'repost', data: repost };
-            }
-
-            // Not found in either
-            throw new ApiError(StatusCodes.NOT_FOUND, "Post or Repost not found with this ID.");
         });
 
-        console.log(result);
-        return result;
-    } catch (error) {
-        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to get single post maybe post not found  ");
-    }
-}
+        // If not found in Post, try Repost
+        if (post) {
+            return { type: 'post', data: post };
+        }
 
-const createRepost = async (payload: any, postId: string, userId: string) => {
-    try {
-        const result = await prisma.repost.create({
-            data: {
-                ...payload,
-                userId,
-                postId,
-            }, select: {
+        const repost = await tx.repost.findUnique({
+            where: { id }, select: {
                 id: true,
                 userId: true,
                 postId: true,
                 content: true,
                 createdAt: true,
                 updatedAt: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    }
+                },
+                post: {
+                    select: {
+                        id: true,
+                        userId: true,
+                        content: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                image: true,
+                            }
+                        }
+                    }
+                }
             }
-        })
-        return result
-    } catch (error) {
-        console.log(error)
-        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to create repost")
-    }
+        });
+
+        if (repost) {
+            return { type: 'repost', data: repost };
+        }
+
+        // Not found in either
+        throw new ApiError(StatusCodes.NOT_FOUND, "Post or Repost not found with this ID.");
+    });
+
+    return result;
+}
+
+const createRepost = async (payload: any, postId: string, userId: string) => {
+    const result = await prisma.repost.create({
+        data: {
+            ...payload,
+            userId,
+            postId,
+        }, select: {
+            id: true,
+            userId: true,
+            postId: true,
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+        }
+    })
+    return result
+}
+
+const getSingleUserPost = async (userId: string) => {
+    const result = await prisma.$transaction(async (tx) => {
+        // Try finding in Post
+        const post = await tx.post.findMany({
+            where: { userId }, select: {
+                id: true,
+                userId: true,
+                content: true,
+                image: true,
+                createdAt: true,
+                updatedAt: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    }
+                }
+            }
+        });
+
+        // If not found in Post, try Repost
+        if (post) {
+            return { type: 'post', data: post };
+        }
+
+        const repost = await tx.repost.findMany({
+            where: { userId }, select: {
+                id: true,
+                userId: true,
+                postId: true,
+                content: true,
+                createdAt: true,
+                updatedAt: true,
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    }
+                },
+                post: {
+                    select: {
+                        id: true,
+                        userId: true,
+                        content: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                image: true,
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (repost) {
+            return { type: 'repost', data: repost };
+        }
+
+        // Not found in either
+        throw new ApiError(StatusCodes.NOT_FOUND, "Post or Repost not found with this ID.");
+    });
+
+    return result;
 }
 
 export const postServices = {
@@ -266,5 +328,6 @@ export const postServices = {
     deletePost,
     getAllPost,
     getSinglePost,
-    createRepost
+    createRepost,
+    getSingleUserPost
 }
