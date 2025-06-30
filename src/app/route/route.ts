@@ -6,7 +6,8 @@ import { postRoutes } from "../modules/post/post.route"
 import { favoriteRoutes } from "../modules/favorite/favorite.route"
 import { applicationRoutes } from "../modules/application/application.route"
 import { commentRoutes } from "../modules/comment/comment.route"
-import { likeRoutes } from "../modules/like/like.route"
+import { experienceRoutes } from "../modules/experience/experience.Routes"
+import { educationRoutes } from "../modules/education/education.Routes"
 
 const router = Router()
 const routes = [
@@ -39,9 +40,13 @@ const routes = [
         component: commentRoutes
     },
     {
-        path: "/like",
-        component: likeRoutes
+        path: "/experience",
+        component: experienceRoutes
     },
+    {
+        path: "/education",
+        component: educationRoutes
+    }
 ]
 
 routes.forEach(route => router.use(route.path, route.component))
