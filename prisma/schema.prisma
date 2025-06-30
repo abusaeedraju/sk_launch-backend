@@ -14,15 +14,21 @@ datasource db {
 }
 
 model User {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  email             String  @unique
-  name              String?
-  phone             String?
-  role              Role    @default(USER)
-  password          String
-  country           String?
-  state             String?
-  city              String?
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  name         String?
+  phone        String?
+  role         Role     @default(USER)
+  password     String
+  country      String?
+  state        String?
+  city         String?
+  videoProfile String?
+  skills       String[]
+  tools        String[]
+  interest     String[]
+  languages    String[]
+
   //for company only
   companyType       String?
   establishmentYear Int?
@@ -33,7 +39,6 @@ model User {
   about             String?
   logoImage         String?
   coverImage        String?
-  videoProfile      String?
 
   fcmToken         String?
   image            String?
@@ -50,8 +55,8 @@ model User {
   Repost           Repost[]
   Favorite         Favorite[]
   Application      JobApplication[]
-  Experience       Experience?
-  Education        Education?
+  Experience       Experience[]
+  Education        Education[]
 }
 
 model Otp {
