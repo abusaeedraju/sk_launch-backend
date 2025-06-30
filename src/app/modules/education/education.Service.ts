@@ -10,6 +10,27 @@ const createEducation = async (payload: Education) => {
   return education;
 };
 
+const updateEducation = async (id: string, payload: any) => {
+  const findEducation = await prisma.education.findUnique({
+    where: {
+      id,
+    },
+  });
+  if (!findEducation) {
+    throw new Error("Education not found");
+  }
+
+  const education = await prisma.education.update({
+    where: {
+      id,
+    },
+    data: {
+      ...payload,
+    },
+  });
+  return education;
+};  
+
 const deleteEducation = async (id: string, userId: string) => {
   const education = await prisma.education.delete({
     where: {
@@ -23,4 +44,5 @@ const deleteEducation = async (id: string, userId: string) => {
 export const educationService = {
   createEducation,
   deleteEducation,
+  updateEducation
 };

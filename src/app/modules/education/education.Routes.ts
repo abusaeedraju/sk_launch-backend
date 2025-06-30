@@ -19,4 +19,10 @@ route.delete(
   educationController.deleteExperienceController
 );
 
+route.put(
+  "/update/:id",
+  auth(Role.USER),
+  educationController.updateExperienceController
+);
+
 export const educationRoutes = route;
