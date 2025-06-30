@@ -5,6 +5,9 @@ import { jobRoutes } from "../modules/job/job.routes";
 import { postRoutes } from "../modules/post/post.route";
 import { favoriteRoutes } from "../modules/favorite/favorite.route";
 import { applicationRoutes } from "../modules/application/application.route";
+import exp from "constants";
+import { experienceRoutes } from "../modules/experience/experience.Routes";
+import { educationRoutes } from "../modules/education/education.Routes";
 
 const router = Router();
 const routes = [
@@ -34,11 +37,11 @@ const routes = [
   },
   {
     path: "/experience",
-    component: applicationRoutes,
+    component: experienceRoutes,
   },
   {
     path: "/education",
-    component: applicationRoutes,
+    component: educationRoutes,
   },
 ];
 

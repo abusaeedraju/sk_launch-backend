@@ -99,7 +99,6 @@ model Experience {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   userId      String   @unique @db.ObjectId
   title       String
-  type        String
   company     String
   startDate   String
   endDate     String
@@ -117,7 +116,6 @@ model Education {
   startDate    String
   endDate      String
   grade        Float
-  description  String
   userDetails  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

@@ -7,7 +7,7 @@ const createEducationValidation = z.object({
   startDate: z.string({ required_error: "Start date is required" }),
   endDate: z.string({ required_error: "End date is required" }),
   grade: z.number({ required_error: "Grade is required" }),
-  description: z.string({ required_error: "Description is required" }),
+  description: z.string({ required_error: "Description is required" }).optional(),
 });
 
 export const educationValidation = { createEducationValidation };
