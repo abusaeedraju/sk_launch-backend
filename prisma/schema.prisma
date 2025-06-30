@@ -49,6 +49,8 @@ model User {
   Repost           Repost[]
   Favorite         Favorite[]
   Application      JobApplication[]
+  Comment          Comment[]
+  ReplyComment     ReplyComment[]
 }
 
 model Otp {
@@ -118,6 +120,7 @@ model Post {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   Repost         Repost[]
+  Comment        Comment[]
 }
 
 model Repost {
@@ -129,6 +132,32 @@ model Repost {
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  Comment        Comment[]
+}
+
+model Comment {
+    id             String   @id @default(auto()) @map("_id") @db.ObjectId
+    comment        String
+    postId         String?   @db.ObjectId
+    repostId       String?   @db.ObjectId
+    userId         String   @db.ObjectId
+    post           Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+    repost         Repost?   @relation(fields: [repostId], references: [id], onDelete: Cascade)
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    ReplyComment   ReplyComment[]
+}
+
+model ReplyComment {
+    id             String   @id @default(auto()) @map("_id") @db.ObjectId
+    commentId      String   @db.ObjectId
+    userId         String   @db.ObjectId
+    replyComment   String
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    comment        Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
 }
 
 model Notifications {

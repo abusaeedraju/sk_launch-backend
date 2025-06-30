@@ -5,6 +5,7 @@ import { jobRoutes } from "../modules/job/job.routes"
 import { postRoutes } from "../modules/post/post.route"
 import { favoriteRoutes } from "../modules/favorite/favorite.route"
 import { applicationRoutes } from "../modules/application/application.route"
+import { commentRoutes } from "../modules/comment/comment.route"
 
 const router = Router()
 const routes = [
@@ -31,6 +32,10 @@ const routes = [
     {
         path: "/application",
         component: applicationRoutes
+    },
+    {
+        path: "/comment",
+        component: commentRoutes
     }
 ]
 

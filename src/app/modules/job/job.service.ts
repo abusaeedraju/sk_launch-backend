@@ -4,7 +4,6 @@ import ApiError from "../../error/ApiErrors"
 
 const createJob = async (payload: any, companyId: string) => {
 
-    try {
         const result = await prisma.job.create({
             data: {
                 ...payload,
@@ -13,11 +12,6 @@ const createJob = async (payload: any, companyId: string) => {
         })
 
         return result
-    } catch (error) {
-        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to create job")
-    }
-
-
 }
 
 const editJob = async (id: string, payload: any) => {
