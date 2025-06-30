@@ -14,6 +14,12 @@ route.post(
   experienceController.createExperienceController
 );
 
+route.put(
+  "/update/:id",
+  auth(Role.USER),
+  experienceController.updateExperienceController
+);
+
 route.delete(
   "/delete/:id",
   auth(Role.USER),

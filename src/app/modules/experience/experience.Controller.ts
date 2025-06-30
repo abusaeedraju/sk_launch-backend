@@ -20,6 +20,21 @@ const createExperienceController = catchAsync(
   }
 );
 
+
+const updateExperienceController = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const body = req.body;
+    const result = await experienceService.updateExperience(id, body);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      message: "Experience updated successfully",
+      data: result,
+      success: true,
+    });
+  }
+);
+
 const deleteExperienceController = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -37,4 +52,5 @@ const deleteExperienceController = catchAsync(
 export const experienceController = {
   createExperienceController,
   deleteExperienceController,
+  updateExperienceController
 };
