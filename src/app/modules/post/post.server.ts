@@ -94,71 +94,94 @@ const deletePost = async (id: string) => {
 }
 
 const getAllPost = async () => {
-    try {
+    // const result = await prisma.$transaction(async (tx) => {
+    //     const [posts, reposts] = await Promise.all([
+    //         tx.post.findMany({
+    //             select: {
+    //                 id: true,
+    //                 userId: true,
+    //                 content: true,
+    //                 image: true,
+    //                 createdAt: true,
+    //                 updatedAt: true,
+    //                 user: {
+    //                     select: {
+    //                         id: true,
+    //                         name: true,
+    //                         image: true,
+    //                     },
+    //                 },
+    //             },
+    //         }),
+    //         tx.repost.findMany({
+    //             select: {
+    //                 id: true,
+    //                 userId: true,
+    //                 postId: true,
+    //                 content: true,
+    //                 createdAt: true,
+    //                 updatedAt: true,
+    //                 user: {
+    //                     select: {
+    //                         id: true,
+    //                         name: true,
+    //                         image: true,
+    //                     },
+    //                 },
+    //                 post: {
+    //                     select: {
+    //                         id: true,
+    //                         userId: true,
+    //                         content: true,
+    //                         image: true,
+    //                         createdAt: true,
+    //                         updatedAt: true,
+    //                         user: {
+    //                             select: {
+    //                                 id: true,
+    //                                 name: true,
+    //                                 image: true,
+    //                             },
+    //                         },
+    //                     },
+    //                 },
+    //             },
+    //         }),
+    //     ]);
 
-        const result = await prisma.$transaction(async (tx) => {
-            const posts = await tx.post.findMany({
+    //     const combinedPosts = [...posts, ...reposts];
+    //     const sortedPosts = combinedPosts.sort(
+    //         (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    //     );
+
+    //     return sortedPosts;
+    // });
+    // console.log(result, "paise");
+
+
+
+    const result2 = await prisma.post.findMany({
+        
+    })
+
+    const repostResult = await prisma.repost.findMany({
+        include: {
+            post: true,
+            user: {
                 select: {
                     id: true,
-                    userId: true,
-                    content: true,
+                    name: true,
                     image: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            image: true,
-                        }
-                    }
                 }
-            })
+            }
+        }
+    })
+    console.log(repostResult, "repostResult");
 
-            const reposts = await tx.repost.findMany({
-                select: {
-                    id: true,
-                    userId: true,
-                    postId: true,
-                    content: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            image: true,
-                        }
-                    },
-                    post: {
-                        select: {
-                            id: true,
-                            userId: true,
-                            content: true,
-                            image: true,
-                            createdAt: true,
-                            updatedAt: true,
-                            user: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    image: true,
-                                }
-                            },
-                        }
-                    }
-                }
-            })
 
-            const combinedPosts = [...posts, ...reposts];
-            const sortedPosts = combinedPosts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-            return sortedPosts
-        })
-        return result
-    } catch (error) {
-        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to get all posts")
-    }
-}
+    return result2;
+};
+
 
 const getSinglePost = async (id: string) => {
     const result = await prisma.$transaction(async (tx) => {

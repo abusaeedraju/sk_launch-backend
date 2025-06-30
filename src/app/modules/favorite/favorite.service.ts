@@ -27,7 +27,22 @@ const getFavorite = async (userId: string) => {
             where: {
                 userId,
             },include: {
-                job: true,
+                job: {
+                    select: {
+                        id: true,
+                        name: true,
+                        salary: true,
+                        location: true,
+                        employmentType: true,
+                        company: {
+                            select: {
+                                id: true,
+                                name: true,
+                                logoImage: true,
+                            }
+                        },
+                    }   
+                },
             }
         })
         if(result.length === 0){
