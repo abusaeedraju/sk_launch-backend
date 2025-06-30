@@ -94,92 +94,71 @@ const deletePost = async (id: string) => {
 }
 
 const getAllPost = async () => {
-    // const result = await prisma.$transaction(async (tx) => {
-    //     const [posts, reposts] = await Promise.all([
-    //         tx.post.findMany({
-    //             select: {
-    //                 id: true,
-    //                 userId: true,
-    //                 content: true,
-    //                 image: true,
-    //                 createdAt: true,
-    //                 updatedAt: true,
-    //                 user: {
-    //                     select: {
-    //                         id: true,
-    //                         name: true,
-    //                         image: true,
-    //                     },
-    //                 },
-    //             },
-    //         }),
-    //         tx.repost.findMany({
-    //             select: {
-    //                 id: true,
-    //                 userId: true,
-    //                 postId: true,
-    //                 content: true,
-    //                 createdAt: true,
-    //                 updatedAt: true,
-    //                 user: {
-    //                     select: {
-    //                         id: true,
-    //                         name: true,
-    //                         image: true,
-    //                     },
-    //                 },
-    //                 post: {
-    //                     select: {
-    //                         id: true,
-    //                         userId: true,
-    //                         content: true,
-    //                         image: true,
-    //                         createdAt: true,
-    //                         updatedAt: true,
-    //                         user: {
-    //                             select: {
-    //                                 id: true,
-    //                                 name: true,
-    //                                 image: true,
-    //                             },
-    //                         },
-    //                     },
-    //                 },
-    //             },
-    //         }),
-    //     ]);
-
-    //     const combinedPosts = [...posts, ...reposts];
-    //     const sortedPosts = combinedPosts.sort(
-    //         (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    //     );
-
-    //     return sortedPosts;
-    // });
-    // console.log(result, "paise");
-
-
-
-    const result2 = await prisma.post.findMany({
-        
-    })
-
-    const repostResult = await prisma.repost.findMany({
-        include: {
-            post: true,
-            user: {
+    const result = await prisma.$transaction(async (tx) => {
+        const [posts, reposts] = await Promise.all([
+            tx.post.findMany({
                 select: {
                     id: true,
-                    name: true,
+                    userId: true,
+                    content: true,
                     image: true,
-                }
-            }
-        }
-    })
-    console.log(repostResult, "repostResult");
+                    createdAt: true,
+                    updatedAt: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                        },
+                    },
+                },
+            }),
+            tx.repost.findMany({
+                select: {
+                    id: true,
+                    userId: true,
+                    postId: true,
+                    content: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                        },
+                    },
+                    post: {
+                        select: {
+                            id: true,
+                            userId: true,
+                            content: true,
+                            image: true,
+                            createdAt: true,
+                            updatedAt: true,
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    image: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            }),
+        ]);
 
+        const combinedPosts = [...posts, ...reposts];
+        const sortedPosts = combinedPosts.sort(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        );
+     
+        return sortedPosts;
+    });
+    //console.log(sortedPosts, "paise");
+    return result;
 
-    return result2;
 };
 
 

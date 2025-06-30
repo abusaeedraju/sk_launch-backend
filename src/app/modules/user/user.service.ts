@@ -171,6 +171,31 @@ const getMyProfile = async (id: string) => {
     const result = await prisma.user.findUnique({
         where: {
             id
+        },
+        include: {
+            Post: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                            logoImage: true,
+                        }
+                    }
+                }
+            },
+            Job: {
+                include: {
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoImage: true,
+                        }
+                    }
+                }
+            },
         }
     })
 
