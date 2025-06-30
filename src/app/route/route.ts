@@ -8,6 +8,7 @@ import { applicationRoutes } from "../modules/application/application.route"
 import { commentRoutes } from "../modules/comment/comment.route"
 import { experienceRoutes } from "../modules/experience/experience.Routes"
 import { educationRoutes } from "../modules/education/education.Routes"
+import { likeRoutes } from "../modules/like/like.route"
 
 const router = Router()
 const routes = [
@@ -46,6 +47,10 @@ const routes = [
     {
         path: "/education",
         component: educationRoutes
+    },
+    {
+        path: "/like",
+        component: likeRoutes
     }
 ]
 
