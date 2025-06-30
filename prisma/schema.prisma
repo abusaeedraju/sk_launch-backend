@@ -26,7 +26,7 @@ model User {
   videoProfile String?
   skills       String[]
   tools        String[]
-  interests     String[]
+  interests    String[]
   languages    String[]
 
   //for company only
@@ -57,6 +57,8 @@ model User {
   Application      JobApplication[]
   Experience       Experience[]
   Education        Education[]
+  Comment          Comment[]
+  ReplyComment     ReplyComment[]
 }
 
 model Otp {
@@ -144,25 +146,52 @@ model Favorite {
 }
 
 model Post {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   content   String
   image     Json[]
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Repost    Repost[]
+  Comment   Comment[]
 }
 
 model Repost {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   content   String?
-  postId    String   @db.ObjectId
-  userId    String   @db.ObjectId
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  postId    String    @db.ObjectId
+  userId    String    @db.ObjectId
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Comment   Comment[]
+}
+
+model Comment {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  comment      String
+  userId       String         @db.ObjectId
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId       String?        @db.ObjectId
+  post         Post?          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  repostId     String?        @db.ObjectId
+  repost       Repost?        @relation(fields: [repostId], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  ReplyComment ReplyComment[]
+}
+
+model ReplyComment {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  replyComment String
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId    String   @db.ObjectId
+  comment      Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Notifications {
