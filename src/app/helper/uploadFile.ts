@@ -37,7 +37,7 @@ const imageFilter = (req: any, file: any, cb: any) => {
 const upload = multer(
   {
     storage: s3Storage,
-    fileFilter: imageFilter, // Apply image filter 
+    // fileFilter: imageFilter, // Apply image filter 
   },
 
 );
@@ -55,6 +55,8 @@ const uploadProfileUpdate = upload.fields([
   { name: 'logoImage', maxCount: 1 },
   { name: 'coverImage', maxCount: 1 },
   { name: 'profileImage', maxCount: 1 },
+  { name: 'videoProfile', maxCount: 1 },
+
 ]);
 const uploadPostImage = upload.array("postImage", 3);
 // Single image uploads
