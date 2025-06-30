@@ -60,6 +60,9 @@ model User {
   user1Conversations Conversation[]   @relation("User1Conversations")
   user2Conversations Conversation[]   @relation("User2Conversations")
   UserMessages       Message[]        @relation("UserMessages")
+  Comment            Comment[]
+  ReplyComment       ReplyComment[]
+  Like               Like[]
 }
 
 model Otp {
@@ -100,11 +103,12 @@ model Job {
 
 model Experience {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @unique @db.ObjectId
+  userId      String    @db.ObjectId
   title       String
   company     String
   startDate   String
   endDate     String
+  description String
   userDetails User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -147,23 +151,74 @@ model Favorite {
 }
 
 model Post {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   content   String
+  totalLike Int       @default(0)
   image     Json[]
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Repost    Repost[]
+  Comment   Comment[]
+  Like      Like[]
 }
 
 model Repost {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   content   String?
-  postId    String   @db.ObjectId
+  totalLike Int       @default(0)
+  postId    String    @db.ObjectId
+  userId    String    @db.ObjectId
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Comment   Comment[]
+  Like      Like[]
+}
+
+model Comment {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  comment      String
+  totalLike    Int            @default(0)
+  userId       String         @db.ObjectId
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId       String?        @db.ObjectId
+  post         Post?          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  repostId     String?        @db.ObjectId
+  repost       Repost?        @relation(fields: [repostId], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  ReplyComment ReplyComment[]
+  Like         Like[]
+}
+
+model ReplyComment {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  replyComment String
+  totalLike    Int      @default(0)
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId    String   @db.ObjectId
+  comment      Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  Like         Like[]
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String?   @db.ObjectId
+  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  repostId  String?   @db.ObjectId
+  repost    Repost?   @relation(fields: [repostId], references: [id], onDelete: Cascade)
+  commentId String?   @db.ObjectId
+  comment   Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  replyCommentId String?   @db.ObjectId
+  replyComment   ReplyComment?  @relation(fields: [replyCommentId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

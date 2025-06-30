@@ -3,70 +3,264 @@ import { StatusCodes } from "http-status-codes"
 import ApiError from "../../error/ApiErrors"
 import { prisma } from "../../../utils/prisma"
 
-const createLike = async (userId: string, postId: string) => {
+const createLike = async (userId: string, id: string) => {
     if (!userId) {
         throw new ApiError(StatusCodes.NOT_FOUND, "UserId not found")
     }
-    if (!postId) {
-        throw new ApiError(StatusCodes.NOT_FOUND, "PostId not found")
+    if (!id) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Id not found")
     }
-    try {
-        const isExistLike = await prisma.like.findFirst({
+
+
+    // like for post
+    const post = await prisma.post.findUnique({
+        where: {
+            id: id
+        }
+    })
+    if (post) {
+
+
+        const isExistLikeInPost = await prisma.like.findFirst({
             where: {
                 userId: userId,
-                postId: postId
+                postId: id
             }
         })
-        if (isExistLike) {
+        if (isExistLikeInPost) {
             await prisma.like.delete({
                 where: {
-                    id: isExistLike.id
+                    id: isExistLikeInPost.id
                 }
             })
 
             const post = await prisma.post.findUnique({
                 where: {
-                    id: postId
+                    id: id
                 }
             })
-            if (!post) {
-                throw new ApiError(StatusCodes.NOT_FOUND, "post not found")
+            if (post) {
+                await prisma.post.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        totalLike: post.totalLike - 1
+                    }
+                })
+                return "Disliked"
             }
-            const result = await prisma.post.update({
-                where: {
-                    id: postId
-                },
+        } else {
+            await prisma.like.create({
                 data: {
-                    totalLike: post.totalLike - 1
+                    userId: userId,
+                    postId: id
                 }
             })
-            return "Disliked"
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (post) {
+
+                await prisma.post.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        totalLike: post.totalLike + 1
+                    }
+                })
+                return "Liked"
+            }
         }
-        const result = await prisma.like.create({
-            data: {
+    }
+
+    // like for repost
+    const repost = await prisma.repost.findUnique({
+        where: {
+            id: id
+        }
+    })
+    if (repost) {
+        const isExistLikeInRepost = await prisma.like.findFirst({
+            where: {
                 userId: userId,
-                postId: postId
+                repostId: id
             }
         })
-        const post = await prisma.post.findUnique({
-            where: {
-                id: postId
+        if (isExistLikeInRepost) {
+            await prisma.like.delete({
+                where: {
+                    id: isExistLikeInRepost.id
+                }
+            })
+
+            const repost = await prisma.repost.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (repost) {
+                await prisma.repost.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        totalLike: repost.totalLike - 1
+                    }
+                })
+                return "Disliked"
             }
-        })
-        if (!post) {
-            throw new ApiError(StatusCodes.NOT_FOUND, "post not found")
+        } else {
+            await prisma.like.create({
+                data: {
+                    userId: userId,
+                    repostId: id
+                }
+            })
+            const repost = await prisma.repost.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (repost) {
+
+                await prisma.repost.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        totalLike: repost.totalLike + 1
+                    }
+                })
+                return "Liked"
+            }
         }
-        const updateLike = await prisma.post.update({
+    }
+    // like for comment
+    const comment = await prisma.comment.findUnique({
+        where: {
+            id: id
+        }
+    })
+    if (comment) {
+        const isExistLikeInComment = await prisma.like.findFirst({
             where: {
-                id: postId
-            },
-            data: {
-                totalLike: post.totalLike + 1
+                userId: userId,
+                commentId: id
             }
         })
-        return "liked"
-    } catch (error) {
-        throw new ApiError(StatusCodes.NOT_FOUND, "like not found")
+        if (isExistLikeInComment) {
+            await prisma.like.delete({
+                where: {
+                    id: isExistLikeInComment.id
+                }
+            })
+
+            const comment = await prisma.comment.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (comment) {
+                await prisma.comment.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        totalLike: comment.totalLike - 1
+                    }
+                })
+            }
+            return "Disliked"
+        } else {
+            await prisma.like.create({
+                data: {
+                    userId: userId,
+                    commentId: id
+                }
+            })
+            const comment = await prisma.comment.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (comment) {
+                await prisma.comment.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        totalLike: comment.totalLike + 1
+                    }
+                })
+                return "Liked"
+            }
+        }
+    }
+    // like for reply comment
+    const replyComment = await prisma.replyComment.findUnique({
+        where: {
+            id: id
+        }
+    })
+    if (replyComment) {
+        const isExistLikeInReplyComment = await prisma.like.findFirst({
+            where: {
+                userId: userId,
+                replyCommentId: id
+            }
+        })
+        if (isExistLikeInReplyComment) {
+            await prisma.like.delete({
+                where: {
+                    id: isExistLikeInReplyComment.id
+                }
+            })
+
+            const replyComment = await prisma.replyComment.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (replyComment) {
+                await prisma.replyComment.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        totalLike: replyComment.totalLike - 1
+                    }
+                })
+            }
+            return "Disliked"
+        } else {
+            await prisma.like.create({
+                data: {
+                    userId: userId,
+                    replyCommentId: id
+                }
+            })
+            const replyComment = await prisma.replyComment.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (replyComment) {
+                await prisma.replyComment.update({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        totalLike: replyComment.totalLike + 1
+                    }
+                })
+                return "Liked"
+            }
+        }
     }
 }
+
 export const LikeService = { createLike } 
