@@ -13,7 +13,7 @@ const createExperienceController = catchAsync(
     const result = await experienceService.createExperience(payload);
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
-      message: "Please check your email for verification",
+      message: "Experience Added successfully",
       data: result,
       success: true,
     });
