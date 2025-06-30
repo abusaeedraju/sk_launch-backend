@@ -27,9 +27,11 @@ const updateUserController = catchAsync(async (req: Request, res: Response) => {
     const logoImage = files?.["logoImage"]?.[0] || null;
     const coverImage = files?.["coverImage"]?.[0] || null;
     const profileImage = files?.["profileImage"]?.[0] || null;
+    const videoProfile = files?.["videoProfile"]?.[0] || null;
 
 
-    const result = await userServices.updateUserIntoDB(id, body, profileImage, logoImage, coverImage)
+
+    const result = await userServices.updateUserIntoDB(id, body, profileImage, logoImage, coverImage, videoProfile)
     sendResponse(res, { statusCode: StatusCodes.OK, message: "User updated successfully", data: result, success: true })
 })
 
