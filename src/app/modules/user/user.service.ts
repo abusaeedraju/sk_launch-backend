@@ -170,29 +170,8 @@ const getMyProfile = async (id: string) => {
       id,
     },
     include: {
-      Post: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-              logoImage: true,
-            },
-          },
-        },
-      },
-      Job: {
-        include: {
-          company: {
-            select: {
-              id: true,
-              name: true,
-              logoImage: true,
-            },
-          },
-        },
-      },
+      Experience: true,
+      // Education: true
     },
   });
 

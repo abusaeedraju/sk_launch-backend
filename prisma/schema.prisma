@@ -103,7 +103,7 @@ model Job {
 
 model Experience {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @unique @db.ObjectId
+  userId      String    @db.ObjectId
   title       String
   company     String
   startDate   String
