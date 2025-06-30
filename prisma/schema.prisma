@@ -55,8 +55,8 @@ model User {
   Repost           Repost[]
   Favorite         Favorite[]
   Application      JobApplication[]
-  Experience       Experience?
-  Education        Education?
+  Experience       Experience[]
+  Education        Education[]
 }
 
 model Otp {
