@@ -26,7 +26,7 @@ model User {
   videoProfile String?
   skills       String[]
   tools        String[]
-  interests     String[]
+  interests    String[]
   languages    String[]
 
   //for company only
@@ -40,23 +40,26 @@ model User {
   logoImage         String?
   coverImage        String?
 
-  fcmToken         String?
-  image            String?
-  status           Status           @default(PENDING)
-  customerId       String?
-  connectAccountId String?
-  isVerified       Boolean          @default(false)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  receiver         Notifications[]  @relation("receiverDetails")
-  sender           Notifications[]  @relation("senderDetails")
-  Job              Job[]
-  Post             Post[]
-  Repost           Repost[]
-  Favorite         Favorite[]
-  Application      JobApplication[]
-  Experience       Experience[]
-  Education        Education[]
+  fcmToken           String?
+  image              String?
+  status             Status           @default(PENDING)
+  customerId         String?
+  connectAccountId   String?
+  isVerified         Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  receiver           Notifications[]  @relation("receiverDetails")
+  sender             Notifications[]  @relation("senderDetails")
+  Job                Job[]
+  Post               Post[]
+  Repost             Repost[]
+  Favorite           Favorite[]
+  Application        JobApplication[]
+  Experience         Experience[]
+  Education          Education[]
+  user1Conversations Conversation[]   @relation("User1Conversations")
+  user2Conversations Conversation[]   @relation("User2Conversations")
+  UserMessages       Message[]        @relation("UserMessages")
 }
 
 model Otp {
@@ -176,6 +179,37 @@ model Notifications {
   updatedAt  DateTime @updatedAt
   receiver   User     @relation("receiverDetails", fields: [receiverId], references: [id])
   sender     User?    @relation("senderDetails", fields: [senderId], references: [id])
+}
+
+model Conversation {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  user1Id   String    @db.ObjectId
+  user2Id   String    @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  // Relationships
+  messages  Message[] @relation("ConversationMessages")
+  user1     User      @relation("User1Conversations", fields: [user1Id], references: [id])
+  user2     User      @relation("User2Conversations", fields: [user2Id], references: [id])
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String   @db.ObjectId
+  senderId       String   @db.ObjectId
+  receiverId     String   @db.ObjectId
+  content        String?
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relationships
+  sender       User         @relation("UserMessages", fields: [senderId], references: [id])
+  conversation Conversation @relation("ConversationMessages", fields: [conversationId], references: [id])
+
+  @@map("messages")
 }
 
 enum Role {
