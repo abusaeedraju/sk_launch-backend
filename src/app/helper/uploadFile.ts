@@ -37,7 +37,7 @@ const imageFilter = (req: any, file: any, cb: any) => {
 const upload = multer(
   {
     storage: s3Storage,
-    fileFilter: imageFilter, // Apply image filter 
+    // fileFilter: imageFilter, // Apply image filter 
   },
 
 );

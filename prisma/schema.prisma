@@ -26,7 +26,7 @@ model User {
   videoProfile String?
   skills       String[]
   tools        String[]
-  interest     String[]
+  interests     String[]
   languages    String[]
 
   //for company only

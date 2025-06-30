@@ -150,6 +150,7 @@ const updateUserIntoDB = async (
       name: result.name,
       email: result.email,
       image: result.image,
+      videoProfile: result.videoProfile,
       role: result.role,
       phone: result.phone,
       country: result.country,
