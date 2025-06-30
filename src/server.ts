@@ -5,6 +5,9 @@ import config from "./config/index";
 import { PrismaConnection } from "./app/DB/PrismaConnection";
 import app from "./app";
 import { WebSocket, WebSocketServer } from "ws";
+import { chatServices } from "./app/modules/chat/chat.Service";
+import { prisma } from "./utils/prisma";
+import { notificationServices } from "./app/modules/notifications/notification.service";
 
 const port = config.port || 5000;
 
@@ -225,7 +228,7 @@ async function main() {
             await handleSendMessage(ws, wss, parsedData);
             break;
 
-          case "viewMessages":
+          case "viewMessage":
             await handleViewMessages(ws, parsedData);
             break;
 
