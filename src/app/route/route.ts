@@ -41,7 +41,7 @@ const routes = [
     {
         path: "/like",
         component: likeRoutes
-    }
+    },
 ]
 
 routes.forEach(route => router.use(route.path, route.component))
