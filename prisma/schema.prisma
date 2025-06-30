@@ -40,25 +40,29 @@ model User {
   logoImage         String?
   coverImage        String?
 
-  fcmToken         String?
-  image            String?
-  status           Status           @default(PENDING)
-  customerId       String?
-  connectAccountId String?
-  isVerified       Boolean          @default(false)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  receiver         Notifications[]  @relation("receiverDetails")
-  sender           Notifications[]  @relation("senderDetails")
-  Job              Job[]
-  Post             Post[]
-  Repost           Repost[]
-  Favorite         Favorite[]
-  Application      JobApplication[]
-  Experience       Experience[]
-  Education        Education[]
-  Comment          Comment[]
-  ReplyComment     ReplyComment[]
+  fcmToken           String?
+  image              String?
+  status             Status           @default(PENDING)
+  customerId         String?
+  connectAccountId   String?
+  isVerified         Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  receiver           Notifications[]  @relation("receiverDetails")
+  sender             Notifications[]  @relation("senderDetails")
+  Job                Job[]
+  Post               Post[]
+  Repost             Repost[]
+  Favorite           Favorite[]
+  Application        JobApplication[]
+  Experience         Experience[]
+  Education          Education[]
+  user1Conversations Conversation[]   @relation("User1Conversations")
+  user2Conversations Conversation[]   @relation("User2Conversations")
+  UserMessages       Message[]        @relation("UserMessages")
+  Comment            Comment[]
+  ReplyComment       ReplyComment[]
+  Like               Like[]
 }
 
 model Otp {
@@ -148,6 +152,7 @@ model Favorite {
 model Post {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   content   String
+  totalLike Int       @default(0)
   image     Json[]
   userId    String    @db.ObjectId
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -155,11 +160,13 @@ model Post {
   updatedAt DateTime  @updatedAt
   Repost    Repost[]
   Comment   Comment[]
+  Like      Like[]
 }
 
 model Repost {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   content   String?
+  totalLike Int       @default(0)
   postId    String    @db.ObjectId
   userId    String    @db.ObjectId
   post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
@@ -167,11 +174,13 @@ model Repost {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Comment   Comment[]
+  Like      Like[]
 }
 
 model Comment {
   id           String         @id @default(auto()) @map("_id") @db.ObjectId
   comment      String
+  totalLike    Int            @default(0)
   userId       String         @db.ObjectId
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   postId       String?        @db.ObjectId
@@ -181,17 +190,36 @@ model Comment {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   ReplyComment ReplyComment[]
+  Like         Like[]
 }
 
 model ReplyComment {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   replyComment String
+  totalLike    Int      @default(0)
   userId       String   @db.ObjectId
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   commentId    String   @db.ObjectId
   comment      Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  Like         Like[]
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String?   @db.ObjectId
+  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  repostId  String?   @db.ObjectId
+  repost    Repost?   @relation(fields: [repostId], references: [id], onDelete: Cascade)
+  commentId String?   @db.ObjectId
+  comment   Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  replyCommentId String?   @db.ObjectId
+  replyComment   ReplyComment?  @relation(fields: [replyCommentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Notifications {
@@ -205,6 +233,37 @@ model Notifications {
   updatedAt  DateTime @updatedAt
   receiver   User     @relation("receiverDetails", fields: [receiverId], references: [id])
   sender     User?    @relation("senderDetails", fields: [senderId], references: [id])
+}
+
+model Conversation {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  user1Id   String    @db.ObjectId
+  user2Id   String    @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  // Relationships
+  messages  Message[] @relation("ConversationMessages")
+  user1     User      @relation("User1Conversations", fields: [user1Id], references: [id])
+  user2     User      @relation("User2Conversations", fields: [user2Id], references: [id])
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String   @db.ObjectId
+  senderId       String   @db.ObjectId
+  receiverId     String   @db.ObjectId
+  content        String?
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relationships
+  sender       User         @relation("UserMessages", fields: [senderId], references: [id])
+  conversation Conversation @relation("ConversationMessages", fields: [conversationId], references: [id])
+
+  @@map("messages")
 }
 
 enum Role {

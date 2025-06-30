@@ -6,6 +6,7 @@ import { postRoutes } from "../modules/post/post.route"
 import { favoriteRoutes } from "../modules/favorite/favorite.route"
 import { applicationRoutes } from "../modules/application/application.route"
 import { commentRoutes } from "../modules/comment/comment.route"
+import { likeRoutes } from "../modules/like/like.route"
 
 const router = Router()
 const routes = [
@@ -36,6 +37,10 @@ const routes = [
     {
         path: "/comment",
         component: commentRoutes
+    },
+    {
+        path: "/like",
+        component: likeRoutes
     }
 ]
 
