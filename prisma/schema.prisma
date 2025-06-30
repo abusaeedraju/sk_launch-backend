@@ -14,15 +14,21 @@ datasource db {
 }
 
 model User {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  email             String  @unique
-  name              String?
-  phone             String?
-  role              Role    @default(USER)
-  password          String
-  country           String?
-  state             String?
-  city              String?
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  name         String?
+  phone        String?
+  role         Role     @default(USER)
+  password     String
+  country      String?
+  state        String?
+  city         String?
+  videoProfile String?
+  skills       String[]
+  tools        String[]
+  interest     String[]
+  languages    String[]
+
   //for company only
   companyType       String?
   establishmentYear Int?
@@ -33,7 +39,6 @@ model User {
   about             String?
   logoImage         String?
   coverImage        String?
-  videoProfile      String?
 
   fcmToken         String?
   image            String?
@@ -50,8 +55,8 @@ model User {
   Repost           Repost[]
   Favorite         Favorite[]
   Application      JobApplication[]
-  Experience       Experience?
-  Education        Education?
+  Experience       Experience[]
+  Education        Education[]
 }
 
 model Otp {
@@ -94,7 +99,6 @@ model Experience {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   userId      String   @unique @db.ObjectId
   title       String
-  type        String
   company     String
   startDate   String
   endDate     String
@@ -112,7 +116,6 @@ model Education {
   startDate    String
   endDate      String
   grade        Float
-  description  String
   userDetails  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
