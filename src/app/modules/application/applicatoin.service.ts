@@ -5,68 +5,23 @@ import { User } from "@prisma/client";
 import { notificationServices } from "../notifications/notification.service";
 
 const createApplication = async (userId: string, jobId: string) => {
-  const isApplied = await prisma.jobApplication.findFirst({
-    where: {
-      userId,
-      jobId,
-    },
-    include: {
-      job: {
-        select: {
-          id: true,
-          name: true,
-          salary: true,
-          company: {
-            select: {
-              id: true,
-              name: true,
-              logoImage: true,
-            },
-          },
-        },
-      },
-    },
-  });
-  if (isApplied) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      "You have already applied for this job"
-    );
-  }
-  const result = await prisma.jobApplication.create({
-    data: {
-      userId,
-      jobId,
-    },
-    include: {
-      job: {
-        select: {
-          id: true,
-          name: true,
-          salary: true,
-          company: {
-            select: {
-              id: true,
-              name: true,
-              logoImage: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  await notificationServices.sendSingleNotification(
-    userId,
-    result.job.company.id as string,
-    {
-      title: "New Application",
-      body: `You have a new application for ${result.job.name}`,
+    const isApplied = await prisma.jobApplication.findFirst({
+        where: {
+            userId,
+            jobId,
+        }
+    })
+    if (isApplied) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "You have already applied for this job")
     }
-  );
-
-  return result;
-};
+    const result = await prisma.jobApplication.create({
+        data: {
+            userId,
+            jobId,
+        }
+    })
+    return result
+}
 
 const getAppliedJob = async (userId: string) => {
   const result = await prisma.jobApplication.findMany({

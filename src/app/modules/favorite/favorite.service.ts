@@ -3,62 +3,70 @@ import ApiError from "../../error/ApiErrors"
 import { StatusCodes } from "http-status-codes"
 
 const addFavorite = async (userId: string, jobId: string) => {
-        const isFavorite = await prisma.favorite.findFirst({
-            where: {
-                jobId,
-                userId,
-            }
-        })
-        console.log("isFavorite",isFavorite)
-        if (isFavorite) {
-            throw new ApiError(StatusCodes.BAD_REQUEST, "Favorite already exists")
+    const isFavorite = await prisma.favorite.findFirst({
+        where: {
+            jobId,
+            userId,
         }
-        const result = await prisma.favorite.create({
-            data: {
-                jobId,
-                userId,
-            }
-        })
-        return result
-}       
+    })
+    if (isFavorite) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Favorite already exists")
+    }
+    const job = await prisma.job.findUnique({
+        where: {
+            id: jobId,
+        }
+    })
+    if (!job) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Your provided job id is invalid")
+    }
+    const result = await prisma.favorite.create({
+        data: {
+            jobId,
+            userId,
+        }
+    })
+    return result
+}
 
 const getFavorite = async (userId: string) => {
-        const result = await prisma.favorite.findMany({
-            where: {
-                userId,
-            },include: {
-                job: {
-                    select: {
-                        id: true,
-                        name: true,
-                        salary: true,
-                        location: true,
-                        employmentType: true,
-                        company: {
-                            select: {
-                                id: true,
-                                name: true,
-                                logoImage: true,
-                            }
-                        },
-                    }   
-                },
-            }
-        })
-        if(result.length === 0){
-            throw new ApiError(StatusCodes.NOT_FOUND, "Favorite list is empty")
+    const result = await prisma.favorite.findMany({
+        where: {
+            userId,
+        }, include: {
+            job: {
+                select: {
+                    id: true,
+                    name: true,
+                    salary: true,
+                    location: true,
+                    employmentType: true,
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoImage: true,
+                        }
+                    },
+                }
+            },
         }
-        return result
-}           
+    })
+    if (result.length === 0) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Favorite list is empty")
+    }
+    return result
+}
 
 const deleteFavorite = async (id: string) => {
-        const result = await prisma.favorite.delete({
-            where: {id
-            }
-        })
-        return result
-}           
-    
+    const result = await prisma.favorite.delete({
+        where: {
+            id
+        }
+    })
+    return result
+}
+
 
 
 export const favoriteServices = {
@@ -66,4 +74,3 @@ export const favoriteServices = {
     getFavorite,
     deleteFavorite,
 }
-    
