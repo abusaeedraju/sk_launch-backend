@@ -171,7 +171,7 @@ const getMyProfile = async (id: string) => {
     },
     include: {
       Experience: true,
-      // Education: true
+      Education: true
     },
   });
 

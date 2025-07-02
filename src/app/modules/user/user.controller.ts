@@ -22,7 +22,6 @@ const updateUserController = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.user
     const body = req?.body as any
     const files = req?.files as any
-    console.log(files);
 
     const logoImage = files?.["logoImage"]?.[0] || null;
     const coverImage = files?.["coverImage"]?.[0] || null;

@@ -13,6 +13,14 @@ const createApplication = async (userId: string, jobId: string) => {
     if (isApplied) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "You have already applied for this job")
     }
+    const job = await prisma.job.findUnique({
+        where: {
+            id: jobId,
+        }
+    })
+    if (!job) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
+    }
     const result = await prisma.jobApplication.create({
         data: {
             userId,
