@@ -104,13 +104,32 @@ const getAllPost = async () => {
                     image: true,
                     createdAt: true,
                     updatedAt: true,
+                    totalLike: true,
                     user: {
                         select: {
                             id: true,
                             name: true,
                             image: true,
+                            role: true
                         },
                     },
+                    Like: {
+                        select: {
+                            userId: true,
+                        },
+                    },
+                    Comment: {
+                        select: {
+                            userId: true,
+                        }
+                    },
+                    _count: {
+                        select: {
+                            Like: true,
+                            Comment: true,
+                        }
+                    },
+
                 },
             }),
             tx.repost.findMany({
@@ -119,6 +138,7 @@ const getAllPost = async () => {
                     userId: true,
                     postId: true,
                     content: true,
+                    totalLike: true,
                     createdAt: true,
                     updatedAt: true,
                     user: {
@@ -126,6 +146,7 @@ const getAllPost = async () => {
                             id: true,
                             name: true,
                             image: true,
+                            role: true
                         },
                     },
                     post: {
@@ -145,6 +166,22 @@ const getAllPost = async () => {
                             },
                         },
                     },
+                    Like: {
+                        select: {
+                            userId: true,
+                        },
+                    },
+                    Comment: {
+                        select: {
+                            userId: true,
+                        }
+                    },
+                    _count: {
+                        select: {
+                            Like: true,
+                            Comment: true,
+                        }
+                    },
                 },
             }),
         ]);
@@ -153,10 +190,9 @@ const getAllPost = async () => {
         const sortedPosts = combinedPosts.sort(
             (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
         );
-     
+
         return sortedPosts;
     });
-    //console.log(sortedPosts, "paise");
     return result;
 
 };
@@ -178,8 +214,26 @@ const getSinglePost = async (id: string) => {
                         id: true,
                         name: true,
                         image: true,
+                        role: true
                     }
-                }
+                },
+                totalLike: true,
+                Like: {
+                    select: {
+                        userId: true,
+                    },
+                },
+                Comment: {
+                    select: {
+                        userId: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        Like: true,
+                        Comment: true,
+                    }
+                },
             }
         });
 
@@ -201,6 +255,7 @@ const getSinglePost = async (id: string) => {
                         id: true,
                         name: true,
                         image: true,
+                        role: true
                     }
                 },
                 post: {
@@ -218,10 +273,29 @@ const getSinglePost = async (id: string) => {
                                 image: true,
                             }
                         }
+
+                    }
+                },
+                totalLike: true,
+                Like: {
+                    select: {
+                        userId: true,
+                    },
+                },
+                Comment: {
+                    select: {
+                        userId: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        Like: true,
+                        Comment: true,
                     }
                 }
             }
-        });
+        }
+        );
 
         if (repost) {
             return { type: 'repost', data: repost };
@@ -269,7 +343,24 @@ const getSingleUserPost = async (userId: string) => {
                         name: true,
                         image: true,
                     }
-                }
+                },
+                totalLike: true,
+                Like: {
+                    select: {
+                        userId: true,
+                    },
+                },
+                Comment: {
+                    select: {
+                        userId: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        Like: true,
+                        Comment: true,
+                    }
+                },
             }
         });
 
@@ -291,6 +382,7 @@ const getSingleUserPost = async (userId: string) => {
                         id: true,
                         name: true,
                         image: true,
+                        role: true
                     }
                 },
                 post: {
@@ -306,10 +398,28 @@ const getSingleUserPost = async (userId: string) => {
                                 id: true,
                                 name: true,
                                 image: true,
+                                role: true
                             }
                         }
                     }
-                }
+                },
+                totalLike: true,
+                Like: {
+                    select: {
+                        userId: true,
+                    },
+                },
+                Comment: {
+                    select: {
+                        userId: true,
+                    }
+                },
+                _count: {
+                    select: {
+                        Like: true,
+                        Comment: true,
+                    }
+                },
             }
         });
 
