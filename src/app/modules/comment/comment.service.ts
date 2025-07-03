@@ -125,7 +125,25 @@ const getComments = async (postId: string) => {
             comment: true,
             createdAt: true,
             updatedAt: true,
-            ReplyComment: true,
+            Like: true,
+            _count: true,
+            ReplyComment: {
+                select: {
+                    id: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true
+                        }
+                    },
+                    commentId: true,
+                    replyComment: true,
+                    createdAt: true,
+                    updatedAt: true
+                }
+            },
         }
     })
     return result

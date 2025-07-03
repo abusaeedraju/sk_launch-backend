@@ -15,5 +15,6 @@ route.put('/change-password', auth(), validateRequest(UserValidation.changePassw
 
 route.put("/update", auth(),fileUploader.uploadProfileUpdate, parseBodyMiddleware, userController.updateUserController)
 route.get("/profile", auth(), userController.getMyProfileController)
+route.get("/get/:userId", auth(), userController.getSingleProfileController)
 
 export const userRoutes = route

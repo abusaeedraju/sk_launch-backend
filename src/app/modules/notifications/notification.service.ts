@@ -10,16 +10,16 @@ import admin from "../../helper/firebaseAdmin";
 // Send notification to a single user
 const sendSingleNotification = async (
   senderId: string,
-  userId: string,
+  receiverId: string,
   payload: any
 ) => {
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { id: receiverId },
   });
 
   await prisma.notifications.create({
     data: {
-      receiverId: userId,
+      receiverId: receiverId,
       senderId: senderId,
       ...payload,
     },
@@ -127,9 +127,6 @@ const getNotificationsFromDB = async (req: any) => {
     orderBy: { createdAt: "desc" },
   });
 
-  if (notifications.length === 0) {
-    throw new ApiError(404, "No notifications found for the user");
-  }
 
   return notifications;
 };

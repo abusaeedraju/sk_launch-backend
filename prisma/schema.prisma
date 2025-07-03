@@ -103,7 +103,7 @@ model Job {
 
 model Experience {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String    @db.ObjectId
+  userId      String   @db.ObjectId
   title       String
   company     String
   startDate   String
@@ -208,19 +208,19 @@ model ReplyComment {
 }
 
 model Like {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  postId    String?   @db.ObjectId
-  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  repostId  String?   @db.ObjectId
-  repost    Repost?   @relation(fields: [repostId], references: [id], onDelete: Cascade)
-  commentId String?   @db.ObjectId
-  comment   Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  replyCommentId String?   @db.ObjectId
-  replyComment   ReplyComment?  @relation(fields: [replyCommentId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String        @db.ObjectId
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId         String?       @db.ObjectId
+  post           Post?         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  repostId       String?       @db.ObjectId
+  repost         Repost?       @relation(fields: [repostId], references: [id], onDelete: Cascade)
+  commentId      String?       @db.ObjectId
+  comment        Comment?      @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  replyCommentId String?       @db.ObjectId
+  replyComment   ReplyComment? @relation(fields: [replyCommentId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model Notifications {
@@ -229,6 +229,7 @@ model Notifications {
   senderId   String?  @db.ObjectId
   title      String
   body       String
+  jobId      String?
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
