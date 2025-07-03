@@ -12,6 +12,6 @@ route.post("/forget-otp-verify", authController.resetOtpVerifyController);
 route.post("/resend-otp",authController.resendOtpController);
 route.post("/reset-password", authController.resetPasswordController);
 
-route.post("/social", authController.socialLoginController);
+route.post("/login/social", authController.socialLoginController);
 
 export const authRoutes = route;

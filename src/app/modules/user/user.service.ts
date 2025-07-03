@@ -178,9 +178,24 @@ const getMyProfile = async (id: string) => {
   return result;
 };
 
+const getSingleProfile = async (userId: string) => {
+  const result = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    include: {
+      Experience: true,
+      Education: true
+    },
+  });
+
+  return result;
+};
+
 export const userServices = {
   createUserIntoDB,
   updateUserIntoDB,
   changePasswordIntoDB,
   getMyProfile,
+  getSingleProfile
 };

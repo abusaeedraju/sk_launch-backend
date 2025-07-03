@@ -2,8 +2,20 @@ import { prisma } from "../../../utils/prisma"
 import ApiError from "../../error/ApiErrors"
 import { StatusCodes } from "http-status-codes"
 import { User } from "@prisma/client"
+import { notificationServices } from "../notifications/notification.service"
+import { title } from "process"
 
 const createApplication = async (userId: string, jobId: string) => {
+
+    const job = await prisma.job.findUnique({
+        where: {
+            id: jobId,
+        }
+    })
+    if (!job) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
+    }
+
     const isApplied = await prisma.jobApplication.findFirst({
         where: {
             userId,
@@ -13,20 +25,22 @@ const createApplication = async (userId: string, jobId: string) => {
     if (isApplied) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "You have already applied for this job")
     }
-    const job = await prisma.job.findUnique({
-        where: {
-            id: jobId,
-        }
-    })
-    if (!job) {
-        throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
-    }
+
     const result = await prisma.jobApplication.create({
         data: {
             userId,
             jobId,
         }
     })
+
+    const payload = {
+        title: "New Job Application",
+        body: `You have a new job application for ${job.name}`,
+        jobId: job.id
+    }
+
+    await notificationServices.sendSingleNotification(userId, job.companyId, payload)
+
     return result
 }
 

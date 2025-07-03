@@ -57,8 +57,6 @@ async function main() {
     userId: string;
   }
 
-  type WebSocketMessage = JoinRoomMessage | SendMessage | ViewMessages;
-
   // WebSocket Extended Interface to include custom properties like userId and roomId
   interface ExtendedWebSocket extends WebSocket {
     userId?: string;
@@ -131,6 +129,8 @@ async function main() {
     }
   };
 
+
+  
   const handleJoinRoom = async (ws: any, parsedData: any) => {
     const { user1Id, user2Id } = parsedData;
     ws.userId = user1Id;
