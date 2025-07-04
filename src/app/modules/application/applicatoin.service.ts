@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes"
 import { User } from "@prisma/client"
 import { notificationServices } from "../notifications/notification.service"
 import { title } from "process"
+import app from './../../../app';
 
 const createApplication = async (userId: string, jobId: string) => {
 
@@ -132,18 +133,51 @@ const getProfileViewedJob = async (userId: string) => {
 }
 
 const shortlistApplication = async (id: string) => {
+    
+    const application = await prisma.jobApplication.findUnique({
+        where: {
+            id,
+        }
+    })
+    if (!application) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Application not found")
+    }
+    
     const result = await prisma.jobApplication.update({
         where: {
             id,
         },
         data: {
             status: "SHORTLISTED",
+        },
+        include: {
+            job: {
+                select: {
+                    id: true,
+                    name: true,
+                    salary: true,
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoImage: true,
+                        }
+                    },
+                }
+            }
         }
+    })
+
+    await notificationServices.sendSingleNotification(result.job.company.id, result.userId, {
+        title: "Job Shortlisted",
+        body: `You have been shortlisted for ${result.job.name}`,
+        jobId: result.job.id
     })
     return result
 }
 
 const getShortlistedJob = async (userId: string) => {
+    
     const result = await prisma.jobApplication.findMany({
         where: {
             userId,
@@ -173,13 +207,44 @@ const getShortlistedJob = async (userId: string) => {
 }
 
 const interviewApplication = async (id: string) => {
+    const application = await prisma.jobApplication.findUnique({
+        where: {
+            id,
+        }
+    })
+    if (!application) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Application not found")
+    }
+
     const result = await prisma.jobApplication.update({
         where: {
             id,
         },
         data: {
             status: "INTERVIEW",
+        },
+        include: {
+            job: {
+                select: {
+                    id: true,
+                    name: true,
+                    salary: true,
+                    company: {
+                        select: {
+                            id: true,
+                            name: true,
+                            logoImage: true,
+                        }
+                    },
+                }
+            }
         }
+    })
+
+       await notificationServices.sendSingleNotification(result.job.company.id, result.userId, {
+        title: "interview call",
+        body: `You have been called interview for ${result.job.name}`,
+        jobId: result.job.id
     })
     return result
 }

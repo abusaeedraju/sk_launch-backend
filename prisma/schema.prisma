@@ -229,7 +229,8 @@ model Notifications {
   senderId   String?  @db.ObjectId
   title      String
   body       String
-  jobId      String?
+  jobId      String?  @db.ObjectId
+  commentId  String?  @db.ObjectId
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
