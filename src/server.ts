@@ -193,7 +193,7 @@ async function main() {
 
     console.log(parsedData, "parsedData");
     // Mark messages as read when the user views the chat
-    await chatServices.markMessagesAsRead(userId, chatroomId);
+    const message= await chatServices.markMessagesAsRead(userId, chatroomId);
 
     // Send updated unread count
     const unreadCount = await chatServices.countUnreadMessages(
@@ -204,6 +204,8 @@ async function main() {
       JSON.stringify({
         type: "unreadCount",
         unreadCount,
+        message
+
       })
     );
   };

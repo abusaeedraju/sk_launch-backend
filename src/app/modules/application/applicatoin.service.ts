@@ -1,46 +1,52 @@
-import { prisma } from "../../../utils/prisma"
-import ApiError from "../../error/ApiErrors"
-import { StatusCodes } from "http-status-codes"
-import { User } from "@prisma/client"
-import { notificationServices } from "../notifications/notification.service"
+import { prisma } from "../../../utils/prisma";
+import ApiError from "../../error/ApiErrors";
+import { StatusCodes } from "http-status-codes";
+import { User } from "@prisma/client";
+import { notificationServices } from "../notifications/notification.service";
 
 const createApplication = async (userId: string, jobId: string) => {
+  const job = await prisma.job.findUnique({
+    where: {
+      id: jobId,
+    },
+  });
+  if (!job) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "Job not found");
+  }
 
-    const job = await prisma.job.findUnique({
-        where: {
-            id: jobId,
-        }
-    })
-    if (!job) {
-        throw new ApiError(StatusCodes.NOT_FOUND, "Job not found")
-    }
+  const isApplied = await prisma.jobApplication.findFirst({
+    where: {
+      userId,
+      jobId,
+    },
+  });
+  if (isApplied) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "You have already applied for this job"
+    );
+  }
+  const result = await prisma.jobApplication.create({
+    data: {
+      userId,
+      jobId,
+    },
+  });
 
-    const isApplied = await prisma.jobApplication.findFirst({
-        where: {
-            userId,
-            jobId,
-        }
-    })
-    if (isApplied) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "You have already applied for this job")
-    }
-    const result = await prisma.jobApplication.create({
-        data: {
-            userId,
-            jobId,
-        }
-    })
+  const payload = {
+    title: "New Job Application",
+    body: `You have a new job application for ${job.name}`,
+    jobId: job.id,
+  };
 
-    const payload = {
-        title: "New Job Application",
-        body: `You have a new job application for ${job.name}`,
-        jobId: job.id
-    }
+  await notificationServices.sendSingleNotification(
+    userId,
+    job.companyId,
+    payload
+  );
 
-    await notificationServices.sendSingleNotification(userId, job.companyId, payload)
-
-    return result
-}
+  return result;
+};
 
 const getAppliedJob = async (userId: string) => {
   const result = await prisma.jobApplication.findMany({
@@ -158,7 +164,7 @@ const shortlistApplication = async (id: string) => {
     data: {
       status: "SHORTLISTED",
     },
-    include : {
+    include: {
       job: {
         select: {
           id: true,
@@ -173,7 +179,7 @@ const shortlistApplication = async (id: string) => {
           },
         },
       },
-    }
+    },
   });
 
   await notificationServices.sendSingleNotification(
