@@ -70,7 +70,7 @@ const changePasswordIntoDB = async (id: string, payload: any) => {
   }
 };
 
-const updateUserIntoDB = async (
+const  updateUserIntoDB = async (
   id: string,
   payload: any,
   profileImage: any,
