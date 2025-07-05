@@ -171,7 +171,8 @@ const shortlistApplication = async (id: string) => {
     await notificationServices.sendSingleNotification(result.job.company.id, result.userId, {
         title: "Job Shortlisted",
         body: `You have been shortlisted for ${result.job.name}`,
-        jobId: result.job.id
+        jobId: result.job.id,
+        type:"job"
     })
     return result
 }
@@ -244,7 +245,8 @@ const interviewApplication = async (id: string) => {
        await notificationServices.sendSingleNotification(result.job.company.id, result.userId, {
         title: "interview call",
         body: `You have been called interview for ${result.job.name}`,
-        jobId: result.job.id
+        jobId: result.job.id,
+        type: "job"
     })
     return result
 }

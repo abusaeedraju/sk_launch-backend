@@ -14,7 +14,7 @@ const createComment = async (payload: any, postId: string, userId: string) => {
             id: postId
         },
         include: {
-            user: true
+            user: true,
         }
     })
     if (post) {
@@ -35,7 +35,9 @@ const createComment = async (payload: any, postId: string, userId: string) => {
          await notificationServices.sendSingleNotification(userId, post.user.id, {
             title: "New Comment",
             body: `${post.user.name} has commented on your post`,
-            commentId: result.id
+            commentId: result.id,
+            postId: postId,
+            type: "post"
         })
 
         return result
@@ -45,7 +47,8 @@ const createComment = async (payload: any, postId: string, userId: string) => {
             id: postId
         },
         include: {
-            user: true
+            user: true,
+            post: true
         }
     })
     if (repost) {
@@ -67,7 +70,9 @@ const createComment = async (payload: any, postId: string, userId: string) => {
         await notificationServices.sendSingleNotification(userId, repost.user.id, {
             title: "New Comment",
             body: `${repost.user.name} has commented on your post`,
-            commentId: result.id
+            commentId: result.id,
+            postId: postId,
+            type: "post"
         })
         return result
     }
@@ -181,7 +186,8 @@ const createReplyComment = async (payload: any, commentId: string, userId: strin
             id: commentId
         },
         include: {
-            user: true
+            user: true,
+            post: true
         }
     })
     if (!comment) {
@@ -226,8 +232,10 @@ const createReplyComment = async (payload: any, commentId: string, userId: strin
     })
      await notificationServices.sendSingleNotification(userId, comment.user.id, {
             title: "New Comment",
-            body: `${comment.user.name} has reply on your comment`,
-            replyCommentId: result.id
+            body: `${result.user.name} has reply on your comment`,
+            replyCommentId: result.id,
+            postId: comment.postId,
+            type: "post"
         })
     return result
 }

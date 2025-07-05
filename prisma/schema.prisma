@@ -224,18 +224,21 @@ model Like {
 }
 
 model Notifications {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  receiverId String   @db.ObjectId
-  senderId   String?  @db.ObjectId
-  title      String
-  body       String
-  jobId      String?  @db.ObjectId
-  commentId  String?  @db.ObjectId
-  read       Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  receiver   User     @relation("receiverDetails", fields: [receiverId], references: [id])
-  sender     User?    @relation("senderDetails", fields: [senderId], references: [id])
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiverId     String   @db.ObjectId
+  senderId       String?  @db.ObjectId
+  title          String
+  body           String
+  jobId          String?  @db.ObjectId
+  commentId      String?  @db.ObjectId
+  replyCommentId String?  @db.ObjectId
+  postId         String?  @db.ObjectId
+  type           String?
+  read           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  receiver       User     @relation("receiverDetails", fields: [receiverId], references: [id])
+  sender         User?    @relation("senderDetails", fields: [senderId], references: [id])
 }
 
 model Conversation {

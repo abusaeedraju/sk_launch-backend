@@ -141,6 +141,7 @@ const updateUserIntoDB = async (
         country: payload.country,
         state: payload.state,
         city: payload.city,
+        about: payload.about,
         image: userImage ?? undefined,
         videoProfile: videoProfileLink ?? undefined,
       },
@@ -156,6 +157,7 @@ const updateUserIntoDB = async (
       country: result.country,
       state: result.state,
       city: result.city,
+      about: result.about,
       createdAt: result.createdAt,
       updatedAt: result.updatedAt,
     };
@@ -170,8 +172,26 @@ const getMyProfile = async (id: string) => {
       id,
     },
     include: {
-      Experience: true,
-      Education: true
+      Experience: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      Education: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      Post: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      Repost: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      }
     },
   });
 
@@ -184,9 +204,27 @@ const getSingleProfile = async (userId: string) => {
       id: userId,
     },
     include: {
-      Experience: true,
-      Education: true
-    },
+      Experience: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      Education: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      Post: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+      Repost: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    }
   });
 
   return result;
