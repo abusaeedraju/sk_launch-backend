@@ -10,6 +10,7 @@ import { experienceRoutes } from "../modules/experience/experience.Routes"
 import { educationRoutes } from "../modules/education/education.Routes"
 import { likeRoutes } from "../modules/like/like.route"
 import { NotificationsRouters } from "../modules/notifications/notification.routes"
+import { ChatRouters } from "../modules/chat/chat.Routes"
 
 const router = Router()
 const routes = [
@@ -56,6 +57,10 @@ const routes = [
     {
         path: "/notification",
         component: NotificationsRouters
+    },
+    {
+        path:"/chats",
+        component: ChatRouters
     }
 ]
 
