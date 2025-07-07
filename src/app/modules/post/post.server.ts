@@ -314,6 +314,10 @@ const getSinglePost = async (id: string) => {
 }
 
 const createRepost = async (payload: any, postId: string, userId: string) => {
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "You provided an invalid post ID.");
+    }
     const result = await prisma.repost.create({
         data: {
             ...payload,
