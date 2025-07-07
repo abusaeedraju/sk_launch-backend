@@ -1,18 +1,23 @@
 import { prisma } from "../../../utils/prisma"
 import ApiError from "../../error/ApiErrors"
 import { StatusCodes } from "http-status-codes"
+import { notificationServices } from './../notifications/notification.service';
+
 
 const createComment = async (payload: any, postId: string, userId: string) => {
-    if(!payload.comment){
+    if (!payload.comment) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "comment is required")
     }
 
     const post = await prisma.post.findUnique({
         where: {
             id: postId
+        },
+        include: {
+            user: true,
         }
     })
-    if(post){
+    if (post) {
         const result = await prisma.comment.create({
             data: {
                 ...payload,
@@ -27,14 +32,26 @@ const createComment = async (payload: any, postId: string, userId: string) => {
                 updatedAt: true,
             }
         })
+         await notificationServices.sendSingleNotification(userId, post.user.id, {
+            title: "New Comment",
+            body: `${post.user.name} has commented on your post`,
+            commentId: result.id,
+            postId: postId,
+            type: "post"
+        })
+
         return result
     }
     const repost = await prisma.repost.findUnique({
         where: {
             id: postId
+        },
+        include: {
+            user: true,
+            post: true
         }
     })
-    if(repost){
+    if (repost) {
         const result = await prisma.comment.create({
             data: {
                 ...payload,
@@ -47,14 +64,22 @@ const createComment = async (payload: any, postId: string, userId: string) => {
                 comment: true,
                 createdAt: true,
                 updatedAt: true,
-            }
+            },
+
+        })
+        await notificationServices.sendSingleNotification(userId, repost.user.id, {
+            title: "New Comment",
+            body: `${repost.user.name} has commented on your post`,
+            commentId: result.id,
+            postId: postId,
+            type: "post"
         })
         return result
-    }    
-}   
+    }
+}
 
-const editComment = async (id: string,userId: string, payload: any) => {
-    if(!payload.comment){
+const editComment = async (id: string, userId: string, payload: any) => {
+    if (!payload.comment) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "comment is required")
     }
     const result = await prisma.comment.update({
@@ -68,9 +93,9 @@ const editComment = async (id: string,userId: string, payload: any) => {
         }
     })
     return result
-}   
+}
 
-const deleteComment = async (id: string,userId: string) => {
+const deleteComment = async (id: string, userId: string) => {
     const result = await prisma.comment.delete({
         where: {
             id,
@@ -78,7 +103,7 @@ const deleteComment = async (id: string,userId: string) => {
         }
     })
     return result
-}   
+}
 
 const getSingleComment = async (id: string) => {
     console.log(id)
@@ -104,11 +129,11 @@ const getSingleComment = async (id: string) => {
         }
     })
     return result
-}   
-    
+}
+
 const getComments = async (postId: string) => {
     const result = await prisma.comment.findMany({
-        where: {    
+        where: {
             postId
         },
         select: {
@@ -125,7 +150,10 @@ const getComments = async (postId: string) => {
             comment: true,
             createdAt: true,
             updatedAt: true,
-            Like: true,
+            Like: {
+                select: {
+                    userId: true
+            }},
             _count: true,
             ReplyComment: {
                 select: {
@@ -147,18 +175,31 @@ const getComments = async (postId: string) => {
         }
     })
     return result
-}       
+}
 
 const createReplyComment = async (payload: any, commentId: string, userId: string) => {
-    if(!payload.replyComment){
+    if (!payload.replyComment) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "replyComment is required")
     }
+    const comment = await prisma.comment.findUnique({
+        where: {
+            id: commentId
+        },
+        include: {
+            user: true,
+            post: true
+        }
+    })
+    if (!comment) {
+       throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid comment id")
+    } 
+    
     const result = await prisma.replyComment.create({
         data: {
             ...payload,
             userId,
             commentId,
-        }, select: {    
+        }, select: {
             id: true,
             userId: true,
             user: {
@@ -169,7 +210,79 @@ const createReplyComment = async (payload: any, commentId: string, userId: strin
                 }
             },
             commentId: true,
-            comment:{
+            comment: {
+                select: {
+                    id: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true
+                        }
+                    },
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            },
+            replyComment: true,
+            createdAt: true,
+            updatedAt: true,
+        }
+    })
+     await notificationServices.sendSingleNotification(userId, comment.user.id, {
+            title: "New Comment",
+            body: `${result.user.name} has reply on your comment`,
+            replyCommentId: result.id,
+            postId: comment.postId,
+            type: "post"
+        })
+    return result
+}
+
+const editReplyComment = async (id: string, userId: string, payload: any) => {
+    if (!payload.replyComment) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "replyComment is required")
+    }
+    const result = await prisma.replyComment.update({
+        where: {
+            id,
+            userId
+        },
+        data: {
+            ...payload,
+            replyComment: payload.replyComment
+        }
+    })
+    return result
+}
+
+const deleteReplyComment = async (id: string, userId: string) => {
+    const result = await prisma.replyComment.delete({
+        where: {
+            id,
+            userId
+        }
+    })
+    return result
+}
+
+const getSingleReplyComment = async (id: string) => {
+    const result = await prisma.replyComment.findUnique({
+        where: {
+            id
+        }, select: {
+            id: true,
+            userId: true,
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    image: true
+                }
+            },
+            commentId: true,
+            comment: {
                 select: {
                     id: true,
                     userId: true,
@@ -192,71 +305,6 @@ const createReplyComment = async (payload: any, commentId: string, userId: strin
     return result
 }
 
-const editReplyComment = async (id: string,userId: string, payload: any) => {
-    if(!payload.replyComment){
-        throw new ApiError(StatusCodes.BAD_REQUEST, "replyComment is required")
-    }
-        const result = await prisma.replyComment.update({
-        where: {
-            id,
-            userId
-        },
-        data: {
-            ...payload,
-            replyComment: payload.replyComment  
-        }
-    })
-    return result
-}   
-
-const deleteReplyComment = async (id: string,userId: string) => {
-    const result = await prisma.replyComment.delete({
-        where: {
-            id,
-            userId
-        }
-    })
-    return result
-}   
-    
-const getSingleReplyComment = async (id: string) => {
-    const result = await prisma.replyComment.findUnique({
-        where: {
-            id
-        },select: {
-            id: true,
-            userId: true,
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    image: true
-                }
-            },
-            commentId: true,
-            comment:{
-                select: {
-                    id: true,
-                    userId: true,
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            image: true
-                        }
-                    },
-                    createdAt: true,
-                    updatedAt: true,
-                }
-            },
-            replyComment: true,
-            createdAt: true,
-            updatedAt: true,
-        }
-    })
-    return result
-}   
-    
 const getReplyComments = async (commentId: string) => {
     const result = await prisma.replyComment.findMany({
         where: {
@@ -273,7 +321,7 @@ const getReplyComments = async (commentId: string) => {
                 }
             },
             commentId: true,
-            comment:{
+            comment: {
                 select: {
                     id: true,
                     userId: true,
@@ -293,9 +341,9 @@ const getReplyComments = async (commentId: string) => {
             replyComment: true,
             createdAt: true,
             updatedAt: true,
-        }   
+        }
     })
     return result
-}       
+}
 
 export const commentServices = { createComment, editComment, deleteComment, getSingleComment, getComments, createReplyComment, editReplyComment, deleteReplyComment, getSingleReplyComment, getReplyComments }  

@@ -1,5 +1,7 @@
 import { Experience } from "@prisma/client";
 import { prisma } from "../../../utils/prisma";
+import ApiError from "../../error/ApiErrors";
+import { StatusCodes } from "http-status-codes";
 
 const createExperience = async (payload: Experience) => {
   const experience = await prisma.experience.create({
@@ -32,6 +34,15 @@ const updateExperience = async (id: string, payload: any) => {
 };
 
 const deleteExperience = async (id: string, userId: string) => {
+  const findExperience = await prisma.experience.findUnique({
+    where: {
+      id,
+      userId,
+    },
+  })
+  if (!findExperience) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "Experience not found")
+  }
   const experience = await prisma.experience.delete({
     where: {
       id,
