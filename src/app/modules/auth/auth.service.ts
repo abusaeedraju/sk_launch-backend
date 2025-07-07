@@ -129,6 +129,7 @@ const resendOtp = async (payload: { email: string }) => {
   name: string;
   role: Role;
   image?: string;
+  fcmToken?: string;
 }) => {
   const userData = await prisma.user.findUnique({
     where: {
@@ -170,6 +171,101 @@ const resendOtp = async (payload: { email: string }) => {
         role: role,
         password: "",
         status: "ACTIVE",
+        isVerified: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    /* const stripeCustomer = await stripe.customers.create({
+      email: payload.email.trim(),
+      name: payload.name || undefined,
+    });
+
+    if (!stripeCustomer.id) {
+      throw new ApiError(
+        StatusCodes.EXPECTATION_FAILED,
+        "Failed to create a Stripe customer"
+      );
+    }
+
+    await prisma.user.update({
+      where: { id: result.id },
+      data: { customerId: stripeCustomer.id },
+    });*/
+
+    const accessToken = jwtHelpers.generateToken(
+      { id: result.id, email: result.email, role: result.role },
+      { expiresIn: "24 hr" }
+    ); 
+    return {
+      id: result.id,
+      name: result.name,
+      email: result.email,
+      role: result.role,
+      image: result?.image,
+      status: result.status,
+      accessToken: accessToken,
+    };
+  }
+}; 
+
+const appleLogin = async (payload: {
+  token: string;
+  name?: string;
+  image?: string;
+  fcmToken?: string;
+}) => {
+const {email} = jwtHelpers.tokenDecoder(payload.token) as JwtPayload;
+
+  const userData = await prisma.user.findUnique({
+    where: {
+      email: email.trim(),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      role: true,
+      customerId: true,
+      status: true,
+      connectAccountId: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  if (userData) {
+    const accessToken = jwtHelpers.generateToken(
+      { id: userData.id, email: userData.email, role: userData.role },
+      { expiresIn: "24 hr" }
+    );
+    return {
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+      role: userData.role,
+      customerId: userData.customerId,
+      image: userData?.image,
+      status: userData.status,
+      accessToken: accessToken,
+    };
+  } else {
+    const result = await prisma.user.create({
+      data: {
+        name: payload?.name,
+        email: email.trim(),
+        role: "USER",
+        password: "",
+        status: "ACTIVE",
+        isVerified: true,
       },
       select: {
         id: true,
@@ -249,5 +345,6 @@ export const authService = {
   resendOtp,
   socialLogin,
   resetOtpVerify,
-  resetPassword
+  resetPassword,
+  appleLogin
 };

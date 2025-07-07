@@ -99,6 +99,7 @@ const getAllPost = async () => {
             tx.post.findMany({
                 select: {
                     id: true,
+                    type: true,
                     userId: true,
                     content: true,
                     image: true,
@@ -135,6 +136,7 @@ const getAllPost = async () => {
             tx.repost.findMany({
                 select: {
                     id: true,
+                    type: true,
                     userId: true,
                     postId: true,
                     content: true,
@@ -204,6 +206,7 @@ const getSinglePost = async (id: string) => {
         const post = await tx.post.findUnique({
             where: { id }, select: {
                 id: true,
+                type: true,
                 userId: true,
                 content: true,
                 image: true,
@@ -245,6 +248,7 @@ const getSinglePost = async (id: string) => {
         const repost = await tx.repost.findUnique({
             where: { id }, select: {
                 id: true,
+                type: true,
                 userId: true,
                 postId: true,
                 content: true,
@@ -261,6 +265,7 @@ const getSinglePost = async (id: string) => {
                 post: {
                     select: {
                         id: true,
+                        type: true,
                         userId: true,
                         content: true,
                         image: true,
@@ -309,6 +314,10 @@ const getSinglePost = async (id: string) => {
 }
 
 const createRepost = async (payload: any, postId: string, userId: string) => {
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "You provided an invalid post ID.");
+    }
     const result = await prisma.repost.create({
         data: {
             ...payload,

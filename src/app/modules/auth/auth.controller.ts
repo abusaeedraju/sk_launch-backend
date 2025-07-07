@@ -74,6 +74,11 @@ const resetPasswordController = catchAsync(async (req: Request, res: Response) =
   sendResponse(res, {statusCode : StatusCodes.OK, success : true, message : "New password create successfully", data : result});
 })
 
+const appleLoginController = catchAsync(async (req: Request, res: Response) => {
+  const body = req.body;
+  const result = await authService.appleLogin(body);
+  sendResponse(res, {statusCode : StatusCodes.OK, success : true, message : "User login successfully", data : result});
+})
 export const authController = {
   logInUserController,
   forgetPasswordController,
@@ -81,5 +86,6 @@ export const authController = {
   resendOtpController,
   socialLoginController,
   resetOtpVerifyController,
-  resetPasswordController
+  resetPasswordController,
+  appleLoginController
 };

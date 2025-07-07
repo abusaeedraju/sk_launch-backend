@@ -13,5 +13,6 @@ route.post("/resend-otp",authController.resendOtpController);
 route.post("/reset-password", authController.resetPasswordController);
 
 route.post("/login/social", authController.socialLoginController);
+route.post("/login/apple", authController.appleLoginController);
 
 export const authRoutes = route;

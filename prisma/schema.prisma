@@ -152,7 +152,8 @@ model Favorite {
 
 model Post {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
+  type      String    @default("post")
+  content   String?
   totalLike Int       @default(0)
   image     Json[]
   userId    String    @db.ObjectId
@@ -166,6 +167,7 @@ model Post {
 
 model Repost {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  type       String   @default("repost")
   content   String?
   totalLike Int       @default(0)
   postId    String    @db.ObjectId
