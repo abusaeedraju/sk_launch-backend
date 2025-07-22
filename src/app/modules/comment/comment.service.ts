@@ -32,14 +32,14 @@ const createComment = async (payload: any, postId: string, userId: string) => {
                 updatedAt: true,
             }
         })
+
          await notificationServices.sendSingleNotification(userId, post.user.id, {
             title: "New Comment",
-            body: `${post.user.name} has commented on your post`,
+            body: `you have a new comment on your post`,
             commentId: result.id,
             postId: postId,
             type: "post"
         })
-
         return result
     }
     const repost = await prisma.repost.findUnique({
@@ -67,13 +67,15 @@ const createComment = async (payload: any, postId: string, userId: string) => {
             },
 
         })
-        await notificationServices.sendSingleNotification(userId, repost.user.id, {
-            title: "New Comment",
-            body: `${repost.user.name} has commented on your post`,
-            commentId: result.id,
-            postId: postId,
-            type: "post"
-        })
+
+        //  await notificationServices.sendSingleNotification(userId, repost.user.id, {
+        //     title: "New Comment",
+        //     body: `you have a new comment on your post`,
+        //     commentId: result.id,
+        //     postId: postId,
+        //     type: "post"
+        // })
+        
         return result
     }
 }

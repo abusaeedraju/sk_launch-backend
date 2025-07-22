@@ -164,6 +164,7 @@ const getAllPost = async () => {
                                     id: true,
                                     name: true,
                                     image: true,
+                                    role: true
                                 },
                             },
                         },
@@ -276,6 +277,7 @@ const getSinglePost = async (id: string) => {
                                 id: true,
                                 name: true,
                                 image: true,
+                                role: true
                             }
                         }
 
@@ -351,6 +353,7 @@ const getSingleUserPost = async (userId: string) => {
                         id: true,
                         name: true,
                         image: true,
+                        role: true
                     }
                 },
                 totalLike: true,

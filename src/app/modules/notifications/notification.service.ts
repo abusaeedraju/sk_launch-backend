@@ -29,7 +29,7 @@ const sendSingleNotification = async (
     // throw new ApiError(404, "User not found with FCM token");
     return;
   }
-
+console.log("fcmToken",user.fcmToken);
   const message = {
     notification: {
       title: payload.title,
@@ -42,6 +42,9 @@ const sendSingleNotification = async (
     const response = await admin.messaging().send(message);
     return response;
   } catch (error: any) {
+
+
+    console.log("ERROR : ",error);
     if (error.code === "messaging/invalid-registration-token") {
       throw new ApiError(400, "Invalid FCM registration token");
     } else if (error.code === "messaging/registration-token-not-registered") {
