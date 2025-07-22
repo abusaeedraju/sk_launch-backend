@@ -33,7 +33,7 @@ const createComment = async (payload: any, postId: string, userId: string) => {
             }
         })
 
-         await notificationServices.sendSingleNotification(userId, post.user.id, {
+        await notificationServices.sendSingleNotification(userId, post.user.id, {
             title: "New Comment",
             body: `you have a new comment on your post`,
             commentId: result.id,
@@ -75,7 +75,7 @@ const createComment = async (payload: any, postId: string, userId: string) => {
         //     postId: postId,
         //     type: "post"
         // })
-        
+
         return result
     }
 }
@@ -134,6 +134,64 @@ const getSingleComment = async (id: string) => {
 }
 
 const getComments = async (postId: string) => {
+    const post = await prisma.post.findUnique({
+        where: {
+            id: postId
+        }
+    })
+    if (!post) {
+        const result = await prisma.repost.findUnique({
+            where: {
+                id: postId
+            }
+        })
+        if (result) {
+            const comments = await prisma.comment.findMany({
+                where: {
+                    repostId: postId
+                },
+                select: {
+                    id: true,
+                    userId: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true
+                        }
+                    },
+                    repostId: true,
+                    comment: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    Like: {
+                        select: {
+                            userId: true
+                        }
+                    },
+                    _count: true,
+                    ReplyComment: {
+                        select: {
+                            id: true,
+                            userId: true,
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    image: true
+                                }
+                            },
+                            commentId: true,
+                            replyComment: true,
+                            createdAt: true,
+                            updatedAt: true
+                        }
+                    },
+                }
+            })
+            return comments
+        }
+    }
     const result = await prisma.comment.findMany({
         where: {
             postId
@@ -155,7 +213,8 @@ const getComments = async (postId: string) => {
             Like: {
                 select: {
                     userId: true
-            }},
+                }
+            },
             _count: true,
             ReplyComment: {
                 select: {
@@ -193,9 +252,9 @@ const createReplyComment = async (payload: any, commentId: string, userId: strin
         }
     })
     if (!comment) {
-       throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid comment id")
-    } 
-    
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid comment id")
+    }
+
     const result = await prisma.replyComment.create({
         data: {
             ...payload,
@@ -232,13 +291,13 @@ const createReplyComment = async (payload: any, commentId: string, userId: strin
             updatedAt: true,
         }
     })
-     await notificationServices.sendSingleNotification(userId, comment.user.id, {
-            title: "New Comment",
-            body: `${result.user.name} has reply on your comment`,
-            replyCommentId: result.id,
-            postId: comment.postId,
-            type: "post"
-        })
+    await notificationServices.sendSingleNotification(userId, comment.user.id, {
+        title: "New Comment",
+        body: `${result.user.name} has reply on your comment`,
+        replyCommentId: result.id,
+        postId: comment.postId,
+        type: "post"
+    })
     return result
 }
 
